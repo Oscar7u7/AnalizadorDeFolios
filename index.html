@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Análisis de folios ZITRO v2.4</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div class="logo-container">
+        <span class="logo-circle">Z</span><span class="logo-circle">I</span>
+        <span class="logo-circle red">T</span><span class="logo-circle">R</span>
+        <span class="logo-circle">O</span>
+      </div>
+      <h1>Análisis de folios Contact Center</h1>
+    </header>
+
+    <section class="panel">
+      <div class="form-grid">
+        <div class="file-upload-wrapper">
+          <label>Reporte diario</label>
+          <div class="custom-file-input">
+            <input id="excelFile" type="file" accept=".xlsx,.xls" />
+            <span id="fileNameDisplay">Elige o arrastra el archivo 📑...</span>
+          </div>
+        </div>
+        <div>
+          <label>Fecha de Corte</label>
+          <input id="analysisDate" type="datetime-local" />
+        </div>
+      </div>
+      <div class="actions">
+        <button id="analyzeBtn" class="btn-primary">Ejecutar Análisis</button>
+        <button id="downloadBtn" class="btn-secondary" disabled>Exportar Reporte (.xlsx)</button>
+      </div>
+      <div id="statusBox" class="status">Listo para procesar.</div>
+    </section>
+
+    <div id="resultsSection" class="hidden">
+      <h2 class="section-title">Resumen de Operación</h2>
+      <div id="summaryCards" class="cards"></div>
+
+      <div class="charts-grid">
+        <div class="panel chart-container">
+          <h3>Distribución por Categoría</h3>
+          <div class="canvas-wrapper">
+            <canvas id="pieChart"></canvas>
+          </div>
+        </div>
+        <div class="panel chart-container">
+          <h3>Volumen de Folios</h3>
+          <div class="canvas-wrapper">
+            <canvas id="barChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <section class="panel">
+        <div class="table-head">
+          <h2>Detalle de Folios</h2>
+          <div class="filters-group">
+            <select id="categoryFilter">
+              <option value="">Todas las categorías</option>
+            </select>
+            <input id="searchInput" type="search" placeholder="Buscar por cualquier dato..." />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr id="tableHeaders"></tr></thead>
+            <tbody id="detailBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
