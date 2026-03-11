@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Análisis de folios ZITRO v2.4</title>
+  <title>Análisis de folios ZITRO v2.5</title>
   <link rel="stylesheet" href="styles.css" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,24 +22,47 @@
 
     <section class="panel">
       <div class="form-grid">
-        <div class="file-upload-wrapper">
-          <label>Reporte diario</label>
-          <div class="custom-file-input">
+        <div class="input-group-wrapper">
+          <label>Excel Diario</label>
+          <div class="custom-file-input" id="dropZone">
             <input id="excelFile" type="file" accept=".xlsx,.xls" />
-            <span id="fileNameDisplay">Elige o arrastra el archivo 📑...</span>
+            <span id="fileNameDisplay">Arrastra o elige el archivo...</span>
           </div>
         </div>
-        <div>
-          <label>Fecha de Corte</label>
-          <input id="analysisDate" type="datetime-local" />
+        <div class="input-group-wrapper">
+          <label>Fecha de Corte (Actualizada)</label>
+          <div class="custom-date-input">
+            <input id="analysisDate" type="datetime-local" />
+          </div>
         </div>
       </div>
       <div class="actions">
         <button id="analyzeBtn" class="btn-primary">Ejecutar Análisis</button>
-        <button id="downloadBtn" class="btn-secondary" disabled>Exportar Reporte (.xlsx)</button>
+        <button id="downloadBtn" class="btn-secondary" disabled>Exportar Reporte Completo</button>
+        <button id="downloadFilteredBtn" class="btn-outline" disabled>Exportar Operativo (Filtrado)</button>
       </div>
       <div id="statusBox" class="status">Listo para procesar.</div>
     </section>
+
+    <div id="dividirModal" class="modal hidden">
+      <div class="modal-content panel">
+        <h3>Reparto de Folios Operativos</h3>
+        <p>¿Entre cuántas personas se dividirá la carga? (Máx. 4)</p>
+        <select id="numPersonas">
+          <option value="1">1 Persona</option>
+          <option value="2">2 Personas</option>
+          <option value="3">3 Personas</option>
+          <option value="4">4 Personas</option>
+        </select>
+        <div id="nombresInputs" class="nombres-grid">
+          <input type="text" placeholder="Nombre Supervisor 1" id="p1" class="p-input">
+        </div>
+        <div class="actions">
+          <button id="confirmExport" class="btn-primary">Descargar con Reparto</button>
+          <button id="closeModal" class="btn-secondary">Cancelar</button>
+        </div>
+      </div>
+    </div>
 
     <div id="resultsSection" class="hidden">
       <h2 class="section-title">Resumen de Operación</h2>
@@ -48,15 +71,11 @@
       <div class="charts-grid">
         <div class="panel chart-container">
           <h3>Distribución por Categoría</h3>
-          <div class="canvas-wrapper">
-            <canvas id="pieChart"></canvas>
-          </div>
+          <div class="canvas-wrapper"><canvas id="pieChart"></canvas></div>
         </div>
         <div class="panel chart-container">
           <h3>Volumen de Folios</h3>
-          <div class="canvas-wrapper">
-            <canvas id="barChart"></canvas>
-          </div>
+          <div class="canvas-wrapper"><canvas id="barChart"></canvas></div>
         </div>
       </div>
 
@@ -64,10 +83,8 @@
         <div class="table-head">
           <h2>Detalle de Folios</h2>
           <div class="filters-group">
-            <select id="categoryFilter">
-              <option value="">Todas las categorías</option>
-            </select>
-            <input id="searchInput" type="search" placeholder="Buscar por cualquier dato..." />
+            <select id="categoryFilter"><option value="">Categorías</option></select>
+            <input id="searchInput" type="search" placeholder="Buscar folio, sala o cliente..." />
           </div>
         </div>
         <div class="table-wrap">
