@@ -38,7 +38,6 @@ document.getElementById('analyzeBtn').addEventListener('click', () => {
 function processData(rows) {
     const refDate = new Date(document.getElementById('analysisDate').value);
     const delCols = ['INICIO REPARACION', 'FIN REPARACION', 'DIAS TECNICO', 'HORAS TECNICO'];
-    
     state.allData = rows.map(row => {
         const cat = classifyRow(row, refDate);
         const clean = {};
@@ -54,12 +53,10 @@ function processData(rows) {
 function classifyRow(row, refDate) {
     const n = v => String(v || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     const obs = n(row['Observacion']), sub = n(row['subfalla']), gar = n(row['Garantia']), ped = n(row['Pedidos Central']);
-
     if (obs.includes("d2express")) return 'Instalacion de D2Express';
     if (sub.includes("venta") || sub.includes("cotizacion") || gar === "venta") return 'Venta';
     if (sub.includes("sala cerrada")) return 'Salas Cerradas';
     if (sub.includes("preventiva")) return 'Servicio tecnico revisiones preventivas';
-    
     if (gar.includes("renta") || gar === "" || gar.includes("datos")) {
         if (!ped) {
             const diff = (refDate - new Date(row['Inicio Folio'])) / 3600000;
@@ -85,6 +82,7 @@ function renderCards() {
     const counts = {};
     state.categories.forEach(c => counts[c] = state.allData.filter(r => r.CategoriaFinal === c).length);
 
+    // Render categorías normales
     state.categories.forEach(cat => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -92,18 +90,23 @@ function renderCards() {
         card.onclick = () => { document.getElementById('categoryFilter').value = cat; applyFilters(); };
         container.appendChild(card);
     });
+
+    // NUEVA TARJETA: TOTAL DE FOLIOS AL CORTE
+    const totalCard = document.createElement('div');
+    totalCard.className = 'card total-card';
+    totalCard.innerHTML = `<div class="label">Total de folios al corte</div><div class="value">${state.allData.length}</div>`;
+    totalCard.onclick = () => { document.getElementById('categoryFilter').value = ""; applyFilters(); };
+    container.appendChild(totalCard);
 }
 
 function renderCharts() {
     const data = state.categories.map(c => state.allData.filter(r => r.CategoriaFinal === c).length);
     if (chartPie) chartPie.destroy(); if (chartBar) chartBar.destroy();
-
     chartPie = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: { labels: state.categories, datasets: [{ data, backgroundColor: state.colors, borderColor: '#111', borderWidth: 2 }] },
         options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { size: 10 } } } } }
     });
-
     chartBar = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: { labels: state.categories, datasets: [{ data, backgroundColor: state.colors }] },
@@ -137,18 +140,11 @@ function applyFilters() {
 document.getElementById('categoryFilter').addEventListener('change', applyFilters);
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
-// MODAL LOGIC
 const modal = document.getElementById('dividirModal');
 const numSelect = document.getElementById('numPersonas');
 const nombresContainer = document.getElementById('nombresInputs');
-
-document.getElementById('downloadFilteredBtn').addEventListener('click', () => {
-    modal.classList.remove('hidden');
-});
-
-document.getElementById('closeModal').addEventListener('click', () => {
-    modal.classList.add('hidden');
-});
+document.getElementById('downloadFilteredBtn').addEventListener('click', () => modal.classList.remove('hidden'));
+document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
 
 numSelect.addEventListener('change', (e) => {
     const n = parseInt(e.target.value);
@@ -162,46 +158,23 @@ document.getElementById('confirmExport').addEventListener('click', () => {
     const n = parseInt(numSelect.value);
     const personas = [];
     for(let i=1; i<=n; i++) personas.push(document.getElementById(`p${i}`).value || `Supervisor ${i}`);
-
     const excluded = ['venta', 'instalacion de d2express', 'salas cerradas', 'almacen'];
     const filtered = state.allData.filter(r => !excluded.includes(r.CategoriaFinal.toLowerCase()));
-    
     const dividedData = filtered.map((row, index) => {
         const personaIndex = index % personas.length;
         const keyFolio = Object.keys(row).find(k => k.toLowerCase() === 'folio') || 'Folio';
-        const valorFolio = row[keyFolio] || "";
-
-        const newRow = {
-            SUPERVISOR: personas[personaIndex],
-            FOLIO: valorFolio,
-            "OBSERVACIONES CC": ""
-        };
-
-        Object.keys(row).forEach(key => {
-            if(key.toLowerCase() !== 'folio') {
-                newRow[key] = row[key];
-            }
-        });
-
+        const newRow = { SUPERVISOR: personas[personaIndex], FOLIO: row[keyFolio] || "", "OBSERVACIONES CC": "" };
+        Object.keys(row).forEach(key => { if(key.toLowerCase() !== 'folio') newRow[key] = row[key]; });
         return newRow;
     });
-
-    exportXls(dividedData, "Reporte_Zitro_Operativo_Estructurado");
+    exportXls(dividedData, "Reporte_Zitro_Operativo");
     modal.classList.add('hidden');
 });
 
-document.getElementById('downloadBtn').addEventListener('click', () => {
-    exportXls(state.allData, "Reporte_Zitro_Completo");
-});
+document.getElementById('downloadBtn').addEventListener('click', () => exportXls(state.allData, "Reporte_Zitro_Completo"));
 
 function exportXls(dataArray, fileNameBase) {
     const wb = XLSX.utils.book_new();
-    const counts = {};
-    state.categories.forEach(c => counts[c] = dataArray.filter(r => r.CategoriaFinal === c).length);
-    const summary = state.categories.map(c => ({ "FOLIOS": c, "No.": counts[c] }));
-    summary.push({ "FOLIOS": "TOTAL", "No.": dataArray.length });
-
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "RESUMEN");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataArray), "DETALLE");
     XLSX.writeFile(wb, `${fileNameBase}_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
 }
