@@ -23,14 +23,14 @@
     <section class="panel">
       <div class="form-grid">
         <div class="input-group-wrapper">
-          <label>Excel Diario</label>
+          <label>Reporte Diario 🕐</label>
           <div class="custom-file-input" id="dropZone">
             <input id="excelFile" type="file" accept=".xlsx,.xls" />
-            <span id="fileNameDisplay">Arrastra o elige el archivo...</span>
+            <span id="fileNameDisplay">Arrastra o elige el archivo...📃</span>
           </div>
         </div>
         <div class="input-group-wrapper">
-          <label>Fecha de Corte (Actualizada)</label>
+          <label>Elige la fecha y hora de Corte</label>
           <div class="custom-date-input">
             <input id="analysisDate" type="datetime-local" />
           </div>
@@ -39,15 +39,15 @@
       <div class="actions">
         <button id="analyzeBtn" class="btn-primary">Ejecutar Análisis</button>
         <button id="downloadBtn" class="btn-secondary" disabled>Exportar Reporte Completo</button>
-        <button id="downloadFilteredBtn" class="btn-outline" disabled>Exportar Operativo (Filtrado)</button>
+        <button id="downloadFilteredBtn" class="btn-outline" disabled>Exportar archivo de objetivos 🎯 (Repartido) </button>
       </div>
-      <div id="statusBox" class="status">Listo para procesar.</div>
+      <div id="statusBox" class="status">Listo para procesar ✅</div>
     </section>
 
     <div id="dividirModal" class="modal hidden">
       <div class="modal-content panel">
         <h3>Reparto de Folios Operativos</h3>
-        <p>¿Entre cuántas personas se dividirá la carga? (Máx. 4)</p>
+        <p>¿Entre cuántos Supervisores se dividirá la carga? (Máx. 4)</p>
         <select id="numPersonas">
           <option value="1">1 Persona</option>
           <option value="2">2 Personas</option>
