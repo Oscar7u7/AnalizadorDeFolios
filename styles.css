@@ -34,9 +34,9 @@ button:disabled { opacity: 0.1; cursor: not-allowed; }
 .modal-content { width: 90%; max-width: 450px; text-align: center; }
 .nombres-grid { margin: 20px 0; display: flex; flex-direction: column; gap: 10px; }
 .hidden { display: none !important; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
 .card { background: white; padding: 20px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
-.card.total-card { border: 3px solid var(--zitro-red); } /* Resaltar tarjeta de total */
+.card.total-card { border: 3px solid var(--zitro-red); }
 .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(230,0,0,0.2); }
 .card .label { color: #5f6c7b; font-size: 11px; font-weight: 700; margin-bottom: 8px; min-height: 32px; display: flex; align-items: center; line-height: 1.2; }
 .card .value { color: #1a1c1e; font-size: 36px; font-weight: 900; }
