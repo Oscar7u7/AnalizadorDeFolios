@@ -81,8 +81,6 @@ function renderCards() {
     container.innerHTML = "";
     const counts = {};
     state.categories.forEach(c => counts[c] = state.allData.filter(r => r.CategoriaFinal === c).length);
-
-    // Render categorías normales
     state.categories.forEach(cat => {
         const card = document.createElement('div');
         card.className = 'card';
@@ -90,8 +88,6 @@ function renderCards() {
         card.onclick = () => { document.getElementById('categoryFilter').value = cat; applyFilters(); };
         container.appendChild(card);
     });
-
-    // NUEVA TARJETA: TOTAL DE FOLIOS AL CORTE
     const totalCard = document.createElement('div');
     totalCard.className = 'card total-card';
     totalCard.innerHTML = `<div class="label">Total de folios al corte</div><div class="value">${state.allData.length}</div>`;
@@ -149,9 +145,7 @@ document.getElementById('closeModal').addEventListener('click', () => modal.clas
 numSelect.addEventListener('change', (e) => {
     const n = parseInt(e.target.value);
     nombresContainer.innerHTML = "";
-    for(let i=1; i<=n; i++){
-        nombresContainer.innerHTML += `<input type="text" placeholder="Nombre Supervisor ${i}" id="p${i}" class="p-input">`;
-    }
+    for(let i=1; i<=n; i++) nombresContainer.innerHTML += `<input type="text" placeholder="Nombre Supervisor ${i}" id="p${i}" class="p-input">`;
 });
 
 document.getElementById('confirmExport').addEventListener('click', () => {
@@ -174,7 +168,13 @@ document.getElementById('confirmExport').addEventListener('click', () => {
 document.getElementById('downloadBtn').addEventListener('click', () => exportXls(state.allData, "Reporte_Zitro_Completo"));
 
 function exportXls(dataArray, fileNameBase) {
+    const counts = {};
+    state.categories.forEach(c => counts[c] = dataArray.filter(r => r.CategoriaFinal === c).length);
+    const summary = state.categories.map(c => ({ "FOLIOS": c, "No.": counts[c] }));
+    summary.push({ "FOLIOS": "TOTAL", "No.": dataArray.length });
+
     const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "RESUMEN");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataArray), "DETALLE");
     XLSX.writeFile(wb, `${fileNameBase}_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
 }
