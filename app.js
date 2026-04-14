@@ -101,12 +101,12 @@ function renderCharts() {
     chartPie = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: { labels: state.categories, datasets: [{ data, backgroundColor: state.colors, borderColor: '#111', borderWidth: 2 }] },
-        options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff', font: { size: 10 } } } } }
+        options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#fff' } } } }
     });
     chartBar = new Chart(document.getElementById('barChart'), {
         type: 'bar',
         data: { labels: state.categories, datasets: [{ data, backgroundColor: state.colors }] },
-        options: { maintainAspectRatio: false, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff', font: { size: 8 } } } }, plugins: { legend: { display: false } } }
+        options: { maintainAspectRatio: false, scales: { y: { ticks: { color: '#fff' } }, x: { ticks: { color: '#fff' } } }, plugins: { legend: { display: false } } }
     });
 }
 
@@ -137,27 +137,25 @@ document.getElementById('categoryFilter').addEventListener('change', applyFilter
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 
 const modal = document.getElementById('dividirModal');
-const numSelect = document.getElementById('numPersonas');
-const nombresContainer = document.getElementById('nombresInputs');
 document.getElementById('downloadFilteredBtn').addEventListener('click', () => modal.classList.remove('hidden'));
 document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
 
-numSelect.addEventListener('change', (e) => {
+document.getElementById('numPersonas').addEventListener('change', (e) => {
     const n = parseInt(e.target.value);
-    nombresContainer.innerHTML = "";
-    for(let i=1; i<=n; i++) nombresContainer.innerHTML += `<input type="text" placeholder="Nombre Supervisor ${i}" id="p${i}" class="p-input">`;
+    const cont = document.getElementById('nombresInputs');
+    cont.innerHTML = "";
+    for(let i=1; i<=n; i++) cont.innerHTML += `<input type="text" placeholder="Nombre Supervisor ${i}" id="p${i}" class="p-input">`;
 });
 
 document.getElementById('confirmExport').addEventListener('click', () => {
-    const n = parseInt(numSelect.value);
+    const n = parseInt(document.getElementById('numPersonas').value);
     const personas = [];
     for(let i=1; i<=n; i++) personas.push(document.getElementById(`p${i}`).value || `Supervisor ${i}`);
     const excluded = ['venta', 'instalacion de d2express', 'salas cerradas', 'almacen'];
     const filtered = state.allData.filter(r => !excluded.includes(r.CategoriaFinal.toLowerCase()));
     const dividedData = filtered.map((row, index) => {
         const personaIndex = index % personas.length;
-        const keyFolio = Object.keys(row).find(k => k.toLowerCase() === 'folio') || 'Folio';
-        const newRow = { SUPERVISOR: personas[personaIndex], FOLIO: row[keyFolio] || "", "OBSERVACIONES CC": "" };
+        const newRow = { SUPERVISOR: personas[personaIndex], FOLIO: row['Folio'] || "", "OBSERVACIONES CC": "" };
         Object.keys(row).forEach(key => { if(key.toLowerCase() !== 'folio') newRow[key] = row[key]; });
         return newRow;
     });
@@ -167,14 +165,69 @@ document.getElementById('confirmExport').addEventListener('click', () => {
 
 document.getElementById('downloadBtn').addEventListener('click', () => exportXls(state.allData, "Reporte_Zitro_Completo"));
 
+// FUNCIÓN DE EXCEL INTELIGENTE Y AUTOMATIZADA
 function exportXls(dataArray, fileNameBase) {
-    const counts = {};
-    state.categories.forEach(c => counts[c] = dataArray.filter(r => r.CategoriaFinal === c).length);
-    const summary = state.categories.map(c => ({ "FOLIOS": c, "No.": counts[c] }));
-    summary.push({ "FOLIOS": "TOTAL", "No.": dataArray.length });
-
+    const includeMonthly = document.getElementById('checkMensual').checked;
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "RESUMEN");
+    let summary = [];
+
+    if (includeMonthly) {
+        // DETECCIÓN DINÁMICA DE AÑOS
+        const currentYear = new Date().getFullYear();
+        const lastYear = currentYear - 1;
+        const yearShort = currentYear.toString().slice(-2);
+        
+        const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+        const dynamicMonths = monthNames.map(m => `${m}-${yearShort}`);
+        
+        // ORDEN DE COLUMNAS FORZADO (FOLIOS -> No. -> Año Anterior -> Meses Año Actual)
+        const headerOrder = ["FOLIOS", "No.", lastYear.toString(), ...dynamicMonths];
+
+        summary = state.categories.map(cat => {
+            const catData = dataArray.filter(r => r.CategoriaFinal === cat);
+            const row = {};
+            row["FOLIOS"] = cat;
+            row["No."] = catData.length;
+            
+            // Cálculo dinámico para el año anterior
+            row[lastYear.toString()] = catData.filter(r => {
+                const d = new Date(r['Inicio Folio']);
+                return d.getFullYear() === lastYear;
+            }).length;
+
+            // Cálculo dinámico para los meses del año actual
+            dynamicMonths.forEach((m, i) => {
+                row[m] = catData.filter(r => {
+                    const d = new Date(r['Inicio Folio']);
+                    return d.getFullYear() === currentYear && d.getMonth() === i;
+                }).length;
+            });
+            return row;
+        });
+
+        // FILA DE TOTALES DINÁMICA
+        const totalRow = {};
+        totalRow["FOLIOS"] = "TOTAL";
+        totalRow["No."] = dataArray.length;
+        totalRow[lastYear.toString()] = dataArray.filter(r => new Date(r['Inicio Folio']).getFullYear() === lastYear).length;
+        
+        dynamicMonths.forEach((m, i) => {
+            totalRow[m] = dataArray.filter(r => {
+                const d = new Date(r['Inicio Folio']);
+                return d.getFullYear() === currentYear && d.getMonth() === i;
+            }).length;
+        });
+        summary.push(totalRow);
+
+        const wsSummary = XLSX.utils.json_to_sheet(summary, { header: headerOrder });
+        XLSX.utils.book_append_sheet(wb, wsSummary, "RESUMEN");
+
+    } else {
+        summary = state.categories.map(c => ({ "FOLIOS": c, "No.": dataArray.filter(r => r.CategoriaFinal === c).length }));
+        summary.push({ "FOLIOS": "TOTAL", "No.": dataArray.length });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "RESUMEN");
+    }
+
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataArray), "DETALLE");
     XLSX.writeFile(wb, `${fileNameBase}_${new Date().toLocaleDateString().replace(/\//g,'-')}.xlsx`);
 }
