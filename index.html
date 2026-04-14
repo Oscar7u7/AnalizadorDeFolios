@@ -37,32 +37,16 @@
         </div>
       </div>
       <div class="actions">
+        <div style="width: 100%; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="checkMensual" style="width: 18px; height: 18px; accent-color: #e60000; cursor: pointer;">
+          <label for="checkMensual" style="text-transform: none; color: white; cursor: pointer; margin: 0;">Reporte Mensual de Objetivos 📊</label>
+        </div>
         <button id="analyzeBtn" class="btn-primary">Ejecutar Análisis</button>
         <button id="downloadBtn" class="btn-secondary" disabled>Exportar Reporte Completo</button>
-        <button id="downloadFilteredBtn" class="btn-outline" disabled>Exportar archivo de objetivos 🎯 (Repartido) </button>
+        <button id="downloadFilteredBtn" class="btn-outline" disabled>Exportar archivo de objetivos 🎯</button>
       </div>
       <div id="statusBox" class="status">Listo para procesar ✅</div>
     </section>
-
-    <div id="dividirModal" class="modal hidden">
-      <div class="modal-content panel">
-        <h3>Reparto de Folios Operativos</h3>
-        <p>¿Entre cuántos Supervisores se dividirá la carga? (Máx. 4)</p>
-        <select id="numPersonas">
-          <option value="1">1 Persona</option>
-          <option value="2">2 Personas</option>
-          <option value="3">3 Personas</option>
-          <option value="4">4 Personas</option>
-        </select>
-        <div id="nombresInputs" class="nombres-grid">
-          <input type="text" placeholder="Nombre Supervisor 1" id="p1" class="p-input">
-        </div>
-        <div class="actions">
-          <button id="confirmExport" class="btn-primary">Descargar con Reparto</button>
-          <button id="closeModal" class="btn-secondary">Cancelar</button>
-        </div>
-      </div>
-    </div>
 
     <div id="resultsSection" class="hidden">
       <h2 class="section-title">Resumen de Operación</h2>
@@ -92,6 +76,26 @@
           </table>
         </div>
       </section>
+    </div>
+  </div>
+
+  <div id="dividirModal" class="modal hidden">
+    <div class="modal-content panel">
+      <h3>Reparto de Folios Operativos</h3>
+      <p>¿Entre cuántos Supervisores se dividirá la carga? (Máx. 4)</p>
+      <select id="numPersonas">
+        <option value="1">1 Persona</option>
+        <option value="2">2 Personas</option>
+        <option value="3">3 Personas</option>
+        <option value="4">4 Personas</option>
+      </select>
+      <div id="nombresInputs" class="nombres-grid">
+        <input type="text" placeholder="Nombre Supervisor 1" id="p1" class="p-input">
+      </div>
+      <div class="actions">
+        <button id="confirmExport" class="btn-primary">Descargar con Reparto</button>
+        <button id="closeModal" class="btn-secondary">Cancelar</button>
+      </div>
     </div>
   </div>
 </body>
