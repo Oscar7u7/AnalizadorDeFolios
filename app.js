@@ -1,8 +1,11 @@
 let chartPie = null, chartBar = null;
 const state = {
-    allData: [], filteredData: [],
-    categories: ['Instalacion de D2Express', 'Venta', 'Salas Cerradas', 'Folios dentro de SLA', 'CC', 'Servicio tecnico pedidos enviado y entregado', 'Servicio tecnico revisiones preventivas', 'Almacen', 'Sin clasificar'],
-    colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#D1BAFF', '#FFBAF2', '#E2F0CB', '#999999']
+    allData: [], 
+    filteredData: [],
+    // 1. Agregamos la categoría a la lista global
+    categories: ['Instalacion de D2Express', 'Venta', 'Salas Cerradas', 'Folios dentro de SLA', 'CC', 'Servicio tecnico pedidos enviado y entregado', 'Servicio tecnico revisiones preventivas', 'Almacen', 'Placas NOM', 'Sin clasificar'],
+    // 2. Agregamos un color para la nueva categoría (#FFCCBC)
+    colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#D1BAFF', '#FFBAF2', '#E2F0CB', '#FFCCBC', '#999999']
 };
 
 const setNow = () => {
@@ -53,6 +56,10 @@ function processData(rows) {
 function classifyRow(row, refDate) {
     const n = v => String(v || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
     const obs = n(row['Observacion']), sub = n(row['subfalla']), gar = n(row['Garantia']), ped = n(row['Pedidos Central']);
+    
+    // 3. Lógica para detectar Placas NOM
+    if (sub.includes("placa nom")) return 'Placas NOM';
+    
     if (obs.includes("d2express")) return 'Instalacion de D2Express';
     if (sub.includes("venta") || sub.includes("cotizacion") || gar === "venta") return 'Venta';
     if (sub.includes("sala cerrada")) return 'Salas Cerradas';
@@ -151,7 +158,10 @@ document.getElementById('confirmExport').addEventListener('click', () => {
     const n = parseInt(document.getElementById('numPersonas').value);
     const personas = [];
     for(let i=1; i<=n; i++) personas.push(document.getElementById(`p${i}`).value || `Supervisor ${i}`);
-    const excluded = ['venta', 'instalacion de d2express', 'salas cerradas', 'almacen'];
+    
+    // 4. EXCLUSIÓN: Agregamos 'placas nom' a la lista de excluidos para el reparto
+    const excluded = ['venta', 'instalacion de d2express', 'salas cerradas', 'almacen', 'placas nom'];
+    
     const filtered = state.allData.filter(r => !excluded.includes(r.CategoriaFinal.toLowerCase()));
     const dividedData = filtered.map((row, index) => {
         const personaIndex = index % personas.length;
@@ -165,22 +175,17 @@ document.getElementById('confirmExport').addEventListener('click', () => {
 
 document.getElementById('downloadBtn').addEventListener('click', () => exportXls(state.allData, "Reporte_Zitro_Completo"));
 
-// FUNCIÓN DE EXCEL INTELIGENTE Y AUTOMATIZADA
 function exportXls(dataArray, fileNameBase) {
     const includeMonthly = document.getElementById('checkMensual').checked;
     const wb = XLSX.utils.book_new();
     let summary = [];
 
     if (includeMonthly) {
-        // DETECCIÓN DINÁMICA DE AÑOS
         const currentYear = new Date().getFullYear();
         const lastYear = currentYear - 1;
         const yearShort = currentYear.toString().slice(-2);
-        
         const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
         const dynamicMonths = monthNames.map(m => `${m}-${yearShort}`);
-        
-        // ORDEN DE COLUMNAS FORZADO (FOLIOS -> No. -> Año Anterior -> Meses Año Actual)
         const headerOrder = ["FOLIOS", "No.", lastYear.toString(), ...dynamicMonths];
 
         summary = state.categories.map(cat => {
@@ -188,14 +193,8 @@ function exportXls(dataArray, fileNameBase) {
             const row = {};
             row["FOLIOS"] = cat;
             row["No."] = catData.length;
-            
-            // Cálculo dinámico para el año anterior
-            row[lastYear.toString()] = catData.filter(r => {
-                const d = new Date(r['Inicio Folio']);
-                return d.getFullYear() === lastYear;
-            }).length;
+            row[lastYear.toString()] = catData.filter(r => new Date(r['Inicio Folio']).getFullYear() === lastYear).length;
 
-            // Cálculo dinámico para los meses del año actual
             dynamicMonths.forEach((m, i) => {
                 row[m] = catData.filter(r => {
                     const d = new Date(r['Inicio Folio']);
@@ -205,7 +204,6 @@ function exportXls(dataArray, fileNameBase) {
             return row;
         });
 
-        // FILA DE TOTALES DINÁMICA
         const totalRow = {};
         totalRow["FOLIOS"] = "TOTAL";
         totalRow["No."] = dataArray.length;
