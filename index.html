@@ -8,8 +8,72 @@
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="app.js"></script>
+
+<style id="zitro-global-menu-style">
+:root{--zgm-topbar-h:68px}
+html{scroll-padding-top:var(--zgm-topbar-h)}
+body{padding-top:var(--zgm-topbar-h)!important}
+.zgm-topbar{
+  box-sizing:border-box;position:fixed;top:0;left:0;right:0;height:var(--zgm-topbar-h);
+  z-index:2147483002;background:#101010;border-bottom:1px solid #2d2d2d;
+  display:flex;align-items:center;padding:0 20px;box-shadow:0 5px 18px rgba(0,0,0,.28);
+  font-family:Arial,sans-serif
+}
+.zgm-trigger{
+  position:static!important;top:auto!important;left:auto!important;z-index:auto!important;
+  height:44px;padding:0 14px;border:1px solid #343434;border-radius:10px;background:#171717;
+  color:#fff;display:flex;align-items:center;gap:10px;box-shadow:none;
+  font-family:Arial,sans-serif;font-weight:800;font-size:12px;letter-spacing:.7px;cursor:pointer
+}
+.zgm-trigger:hover{background:#222}.zgm-bars{width:21px;display:flex;flex-direction:column;gap:4px}
+.zgm-bars i{display:block;height:2px;width:21px;background:#fff;border-radius:3px}
+.zgm-topbar-title{margin-left:14px;color:#777;font-size:11px;font-weight:700;letter-spacing:1px}
+.zgm-overlay{position:fixed;inset:var(--zgm-topbar-h) 0 0 0;z-index:2147482998;background:rgba(0,0,0,.62);opacity:0;visibility:hidden;transition:.2s}
+.zgm-overlay.open{opacity:1;visibility:visible}
+.zgm-drawer{
+  box-sizing:border-box;position:fixed;left:0;top:var(--zgm-topbar-h);z-index:2147483001;
+  width:min(345px,88vw);height:calc(100vh - var(--zgm-topbar-h));
+  background:linear-gradient(180deg,#171717,#080808);border-right:1px solid #303030;
+  box-shadow:20px 0 55px rgba(0,0,0,.55);transform:translateX(-105%);
+  transition:transform .24s ease;padding:20px 17px;font-family:Arial,sans-serif;color:#fff;
+  overflow-y:auto
+}
+.zgm-drawer.open{transform:translateX(0)}
+.zgm-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 18px;border-bottom:1px solid #2a2a2a}
+.zgm-brand{display:flex;align-items:center;gap:11px}.zgm-z{width:39px;height:39px;border-radius:50%;background:#e60000;display:grid;place-items:center;font-weight:900}
+.zgm-brand b{display:block;font-size:14px;letter-spacing:1.4px}.zgm-brand small{display:block;color:#888;margin-top:3px;font-size:10px}
+.zgm-close{width:38px;height:38px;padding:0;border:1px solid #333;border-radius:9px;background:transparent;color:#aaa;font-size:25px;line-height:1;cursor:pointer}
+.zgm-close:hover{background:#222;color:#fff}
+.zgm-nav{display:flex;flex-direction:column;gap:8px;padding-top:19px}.zgm-link{box-sizing:border-box;min-height:52px;padding:11px 13px;border:1px solid transparent;border-radius:10px;color:#ccc;text-decoration:none!important;display:flex;align-items:center;gap:11px;font-size:12px;font-weight:800;letter-spacing:.2px;transition:.16s}
+.zgm-link:hover{background:#1e1e1e;border-color:#333;color:#fff;transform:translateX(3px)}
+.zgm-link.active{background:linear-gradient(90deg,rgba(230,0,0,.24),rgba(230,0,0,.05));border-color:rgba(230,0,0,.5);color:#fff}
+.zgm-icon{flex:0 0 31px;width:31px;height:31px;border-radius:8px;background:#050505;border:1px solid #333;display:grid;place-items:center;color:#aaa;font-size:11px}
+.zgm-link.active .zgm-icon{background:#e60000;border-color:#e60000;color:#fff}
+@media(max-width:650px){
+  :root{--zgm-topbar-h:60px}
+  .zgm-topbar{padding:0 12px}.zgm-trigger{height:40px;padding:0 12px}
+  .zgm-topbar-title{display:none}.zgm-drawer{width:90vw}
+}
+</style>
+
 </head>
 <body>
+
+<div class="zgm-topbar"><button class="zgm-trigger" id="zgmTrigger" type="button" aria-label="Abrir menú">
+  <span class="zgm-bars"><i></i><i></i><i></i></span><span>MENÚ</span>
+</button><span class="zgm-topbar-title">ZITRO · HERRAMIENTAS DE SUPERVISIÓN</span></div>
+<div class="zgm-overlay" id="zgmOverlay"></div>
+<aside class="zgm-drawer" id="zgmDrawer">
+  <div class="zgm-head">
+    <div class="zgm-brand"><span class="zgm-z">Z</span><span><b>ZITRO</b><small>HERRAMIENTAS DE SUPERVISIÓN</small></span></div>
+    <button class="zgm-close" id="zgmClose" type="button" aria-label="Cerrar menú">×</button>
+  </div>
+  <nav class="zgm-nav"><a class="zgm-link active" href="index.html"><span class="zgm-icon">▦</span><span>ANALISIS DE FOLIOS</span></a>
+<a class="zgm-link" href="ACCESOS WINPOT.html"><span class="zgm-icon">W</span><span>ACCESOS WINPOT</span></a>
+<a class="zgm-link" href="ACCESOS BIG BOLA.html"><span class="zgm-icon">B</span><span>ACCESOS BIG BOLA</span></a>
+<a class="zgm-link" href="ACCESOS PROMOTORIA GENERAL.html"><span class="zgm-icon">P</span><span>ACCESOS PROMOTORIA GENERAL</span></a></nav>
+</aside>
+
   <div class="container">
     <header class="hero">
       <div class="logo-container">
@@ -98,5 +162,18 @@
       </div>
     </div>
   </div>
+
+<script id="zitro-global-menu-script">
+(function(){
+ const t=document.getElementById('zgmTrigger'),d=document.getElementById('zgmDrawer'),o=document.getElementById('zgmOverlay'),c=document.getElementById('zgmClose');
+ if(!t||!d||!o||!c)return;
+ const set=v=>{d.classList.toggle('open',v);o.classList.toggle('open',v);};
+ t.addEventListener('click',()=>set(!d.classList.contains('open')));
+ c.addEventListener('click',()=>set(false));
+ o.addEventListener('click',()=>set(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')set(false);});
+})();
+</script>
+
 </body>
 </html>
