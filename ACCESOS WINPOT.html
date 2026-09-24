@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZITRO • Generador Accesos WINPOT</title>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --zitro-red: #e11d48;
+      --zitro-dark: #0f172a;
+      --zitro-card: #1e293b;
+      --zitro-border: #334155;
+      --accent-cyan: #06b6d4;
+      --accent-green: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
+    body {
+      background-color: #0b0f19;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 30px 20px;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(225, 29, 72, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.06) 0%, transparent 40%);
+      background-attachment: fixed;
+    }
+    .container { max-width: 1320px; margin: 0 auto; }
+    
+    header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 5px solid var(--zitro-red);
+      padding: 22px 28px;
+      border-radius: 14px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .brand-title { display: flex; align-items: center; gap: 14px; }
+    .zitro-logo-badge {
+      background: linear-gradient(135deg, #e11d48, #9f1239);
+      color: white;
+      font-weight: 900;
+      font-size: 16px;
+      letter-spacing: 2px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
+    }
+    header h1 { font-size: 20px; font-weight: 700; color: #ffffff; letter-spacing: 0.3px; }
+    header p { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+    
+    .status-tags { display: flex; gap: 10px; }
+    .chip {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--accent-cyan);
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--zitro-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: var(--zitro-red);
+      border-radius: 50%;
+    }
+
+    textarea {
+      width: 100%;
+      height: 150px;
+      background: rgba(15, 23, 42, 0.85);
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+    }
+
+    .controls-bar {
+      display: flex;
+      gap: 16px;
+      margin-top: 18px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: rgba(15, 23, 42, 0.5);
+      padding: 14px 18px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .month-badge-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .month-pill {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.15));
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      color: #38bdf8;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      min-width: 170px;
+      text-align: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 20px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--zitro-red), #be123c);
+      color: white;
+      box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #f43f5e, #e11d48);
+      transform: translateY(-1px);
+    }
+    .btn-export {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: white;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    .btn-export:hover {
+      background: linear-gradient(135deg, #10b981, #059669);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid #475569;
+    }
+    .btn-ghost:hover {
+      color: #ffffff;
+      border-color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--zitro-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+    }
+    .stat-label { font-size: 11.5px; color: var(--text-muted); font-weight: 500; }
+    .stat-value { font-size: 20px; font-weight: 700; color: #fff; margin-top: 4px; }
+
+    /* Canvas visualización limpia estilo Excel */
+    .table-viewport {
+      overflow-x: auto;
+      max-height: 540px;
+      border-radius: 8px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      background: #ffffff;
+      padding: 14px;
+    }
+    table {
+      border-collapse: collapse;
+      font-size: 11px;
+      text-align: center;
+      background: #ffffff;
+    }
+    th, td { padding: 5px 8px; white-space: nowrap; }
+    
+    th.main-header { background-color: #002060; color: #ffffff; font-weight: 700; font-size: 11px; height: 26px; border: 1px solid #ffffff; }
+    th.sub-header { background-color: #333F4F; color: #ffffff; font-weight: 700; font-size: 10px; border: 1px solid #ffffff; vertical-align: middle; }
+    th.day-header { color: #ffffff; font-weight: 700; width: 28px; border: 1px solid #ffffff; }
+    th.day-header-light { background-color: #8EA9DB; }
+    th.day-header-dark { background-color: #1F4E78; }
+    
+    /* Separador visual exacto de columnas ocultas en Excel (F || BS) de 0.5 cm */
+    .col-hidden-sep {
+      width: 5mm;
+      min-width: 5mm;
+      max-width: 5mm;
+      background: repeating-linear-gradient(90deg, #ffffff, #ffffff 2px, #166534 2px, #166534 3.5px, #ffffff 3.5px, #ffffff 5px);
+      border-top: 1px solid #ffffff;
+      border-bottom: 1px solid #ffffff;
+      padding: 0 !important;
+    }
+
+    td.win-cell { background-color: #BDD7EE; color: #000000; border: 1px solid #ffffff; font-size: 10px; }
+    td.text-left { text-align: left; }
+    td.day-cell { background-color: #BDD7EE; color: #000000; font-weight: bold; border: 1px solid #ffffff; }
+    
+    .tag-coord {
+      display: inline-block;
+      background: rgba(225, 29, 72, 0.15);
+      color: #f43f5e;
+      border: 1px solid rgba(225, 29, 72, 0.3);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+
+    .warnings-box {
+      display: none;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.5);
+      background: rgba(120, 53, 15, 0.22);
+      color: #fde68a;
+    }
+
+    .warnings-box.visible { display: block; }
+    .warnings-title { font-size: 13px; font-weight: 700; color: #fbbf24; margin-bottom: 8px; }
+    .warnings-list { margin: 0; padding-left: 20px; font-size: 12.5px; line-height: 1.55; }
+    .warnings-list li + li { margin-top: 4px; }
+    .warning-raw { font-family: 'JetBrains Mono', monospace; color: #fff7ed; }
+
+
+    .structure-errors-box {
+      display: none;
+      margin-top: 16px;
+      padding: 15px 17px;
+      border-radius: 10px;
+      border: 1px solid rgba(244, 63, 94, 0.65);
+      background: rgba(127, 29, 29, 0.28);
+      color: #fecdd3;
+    }
+    .structure-errors-box.visible { display: block; }
+    .structure-errors-title { font-size: 13.5px; font-weight: 800; color: #fb7185; margin-bottom: 7px; }
+    .structure-errors-help { font-size: 12.5px; color: #fda4af; margin-bottom: 8px; }
+    .structure-errors-list { margin: 0; padding-left: 20px; font-size: 12.5px; line-height: 1.55; }
+    .structure-errors-list li + li { margin-top: 5px; }
+    .structure-col { font-family: 'JetBrains Mono', monospace; color: #fff1f2; font-weight: 600; }
+  </style>
+
+<style id="zitro-global-menu-style">
+:root{--zgm-topbar-h:68px}
+html{scroll-padding-top:var(--zgm-topbar-h)}
+body{padding-top:var(--zgm-topbar-h)!important}
+.zgm-topbar{
+  box-sizing:border-box;position:fixed;top:0;left:0;right:0;height:var(--zgm-topbar-h);
+  z-index:2147483002;background:#101010;border-bottom:1px solid #2d2d2d;
+  display:flex;align-items:center;padding:0 20px;box-shadow:0 5px 18px rgba(0,0,0,.28);
+  font-family:Arial,sans-serif
+}
+.zgm-trigger{
+  position:static!important;top:auto!important;left:auto!important;z-index:auto!important;
+  height:44px;padding:0 14px;border:1px solid #343434;border-radius:10px;background:#171717;
+  color:#fff;display:flex;align-items:center;gap:10px;box-shadow:none;
+  font-family:Arial,sans-serif;font-weight:800;font-size:12px;letter-spacing:.7px;cursor:pointer
+}
+.zgm-trigger:hover{background:#222}.zgm-bars{width:21px;display:flex;flex-direction:column;gap:4px}
+.zgm-bars i{display:block;height:2px;width:21px;background:#fff;border-radius:3px}
+.zgm-topbar-title{margin-left:14px;color:#777;font-size:11px;font-weight:700;letter-spacing:1px}
+.zgm-overlay{position:fixed;inset:var(--zgm-topbar-h) 0 0 0;z-index:2147482998;background:rgba(0,0,0,.62);opacity:0;visibility:hidden;transition:.2s}
+.zgm-overlay.open{opacity:1;visibility:visible}
+.zgm-drawer{
+  box-sizing:border-box;position:fixed;left:0;top:var(--zgm-topbar-h);z-index:2147483001;
+  width:min(345px,88vw);height:calc(100vh - var(--zgm-topbar-h));
+  background:linear-gradient(180deg,#171717,#080808);border-right:1px solid #303030;
+  box-shadow:20px 0 55px rgba(0,0,0,.55);transform:translateX(-105%);
+  transition:transform .24s ease;padding:20px 17px;font-family:Arial,sans-serif;color:#fff;
+  overflow-y:auto
+}
+.zgm-drawer.open{transform:translateX(0)}
+.zgm-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 18px;border-bottom:1px solid #2a2a2a}
+.zgm-brand{display:flex;align-items:center;gap:11px}.zgm-z{width:39px;height:39px;border-radius:50%;background:#e60000;display:grid;place-items:center;font-weight:900}
+.zgm-brand b{display:block;font-size:14px;letter-spacing:1.4px}.zgm-brand small{display:block;color:#888;margin-top:3px;font-size:10px}
+.zgm-close{width:38px;height:38px;padding:0;border:1px solid #333;border-radius:9px;background:transparent;color:#aaa;font-size:25px;line-height:1;cursor:pointer}
+.zgm-close:hover{background:#222;color:#fff}
+.zgm-nav{display:flex;flex-direction:column;gap:8px;padding-top:19px}.zgm-link{box-sizing:border-box;min-height:52px;padding:11px 13px;border:1px solid transparent;border-radius:10px;color:#ccc;text-decoration:none!important;display:flex;align-items:center;gap:11px;font-size:12px;font-weight:800;letter-spacing:.2px;transition:.16s}
+.zgm-link:hover{background:#1e1e1e;border-color:#333;color:#fff;transform:translateX(3px)}
+.zgm-link.active{background:linear-gradient(90deg,rgba(230,0,0,.24),rgba(230,0,0,.05));border-color:rgba(230,0,0,.5);color:#fff}
+.zgm-icon{flex:0 0 31px;width:31px;height:31px;border-radius:8px;background:#050505;border:1px solid #333;display:grid;place-items:center;color:#aaa;font-size:11px}
+.zgm-link.active .zgm-icon{background:#e60000;border-color:#e60000;color:#fff}
+@media(max-width:650px){
+  :root{--zgm-topbar-h:60px}
+  .zgm-topbar{padding:0 12px}.zgm-trigger{height:40px;padding:0 12px}
+  .zgm-topbar-title{display:none}.zgm-drawer{width:90vw}
+}
+</style>
+
+</head>
+<body>
+
+<div class="zgm-topbar"><button class="zgm-trigger" id="zgmTrigger" type="button" aria-label="Abrir menú">
+  <span class="zgm-bars"><i></i><i></i><i></i></span><span>MENÚ</span>
+</button><span class="zgm-topbar-title">ZITRO · HERRAMIENTAS</span></div>
+<div class="zgm-overlay" id="zgmOverlay"></div>
+<aside class="zgm-drawer" id="zgmDrawer">
+  <div class="zgm-head">
+    <div class="zgm-brand"><span class="zgm-z">Z</span><span><b>ZITRO</b><small>HERRAMIENTAS</small></span></div>
+    <button class="zgm-close" id="zgmClose" type="button" aria-label="Cerrar menú">×</button>
+  </div>
+  <nav class="zgm-nav"><a class="zgm-link" href="index.html"><span class="zgm-icon">▦</span><span>ANALISIS DE FOLIOS</span></a>
+<a class="zgm-link active" href="ACCESOS WINPOT.html"><span class="zgm-icon">W</span><span>ACCESOS WINPOT</span></a>
+<a class="zgm-link" href="ACCESOS BIG BOLA.html"><span class="zgm-icon">B</span><span>ACCESOS BIG BOLA</span></a>
+<a class="zgm-link" href="ACCESOS PROMOTORIA GENERAL.html"><span class="zgm-icon">P</span><span>ACCESOS PROMOTORIA GENERAL</span></a></nav>
+</aside>
+
+  <div class="container">
+    <header>
+      <div class="brand-title">
+        <div class="zitro-logo-badge">ZITRO</div>
+        <div>
+          <h1> GENERADOR DE ACCESOS • WINPOT</h1>
+        </div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">ROL SEMANAL (EXCEL)</div>
+      </div>
+      <textarea id="rawInput" placeholder="Copia desde Excel las columnas del rol (REGION, NOMBRE DEL PROMOTOR, LUNES a SABADO, HORARIO) y pégalas directamente aquí..."></textarea>
+      
+      <div class="controls-bar">
+        <div class="month-badge-display">
+          <span>Período Detectado:</span>
+          <div class="month-pill" id="monthDisplay">EN ESPERA DE DATOS...</div>
+        </div>
+        <div style="flex-grow: 1;"></div>
+        <button class="btn btn-ghost" onclick="limpiar()">Limpiar</button>
+        <button class="btn btn-primary" onclick="procesarDatos()">⚡ Procesar y Generar</button>
+        <button class="btn btn-export" id="btnExport" style="display: none;" onclick="exportarExcel()">📥 Descargar Excel (.xlsx)</button>
+      </div>
+      <div class="structure-errors-box" id="structureErrorsBox"></div>
+    </div>
+
+    <div class="card" id="resultCard" style="display: none;">
+      <div class="card-header">
+        <div class="card-title">2. Vista Previa Oficial WINPOT Generada</div>
+      </div>
+      <div class="stats-container" id="statsContainer"></div>
+      <div class="warnings-box" id="warningsBox"></div>
+      <div class="table-viewport" id="previewContainer"></div>
+    </div>
+  </div>
+
+  <script>
+    const MESES = [
+      'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
+      'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+    ];
+
+    // Catálogo oficial de responsables regionales.
+    // Los alias permiten recibir distintas formas de escritura desde el rol sin
+    // cambiar la persona responsable asignada.
+    const REGIONALES = [
+      { nombre: 'Israel Jonathan Torres Osorio', aliases: ['MONTERREY', 'MTY'] },
+      { nombre: 'Pamela Ortinez Torres', aliases: ['CDMX', 'CDMX 1', 'CDMX 2', 'CDMX 1 Y 2', 'CDMX 1Y2'] },
+      { nombre: 'Lucero Alejandra Alvarez Gonzalez', aliases: ['GUADALAJARA', 'GDL'] },
+      { nombre: 'Patsy Paola Fajardo Perez', aliases: ['PACIFICO'] },
+      { nombre: 'David Cardenas Dominguez', aliases: ['PENINSULA'] },
+      { nombre: 'Daniela Sotomayor Alarcón', aliases: ['PUEBLA/VERACRUZ', 'PUEBLA VERACRUZ', 'PUE/VER', 'PUE.VER', 'PUEBLA', 'VERACRUZ'] },
+      { nombre: 'Alfredo Roberto Loera Lafont Díaz de León', aliases: ['TIJUANA'] },
+      { nombre: 'Lorena Estefanía Alcántara Saldívar', aliases: ['CENTRO'] }
+    ];
+
+    const COORDINADORAS = [
+      'Valeria Cristina Rodriguez Rodriguez',
+      'Yazmin López Velázquez',
+      'Kimberly Adriana Gonzalez Baeza',
+      'Debanhi Citlaly Cortez Rodriguez',
+      'Christian Lizzette Bernal Celis',
+      'Beirut Espinoza Maya',
+      'Alejandra Gomez Gutierrez'
+    ];
+
+    let processedOutput = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const now = new Date();
+      document.getElementById('monthDisplay').textContent = MESES[now.getMonth()] + ' ' + now.getFullYear();
+    });
+
+    function normalizar(texto) {
+      return (texto || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toUpperCase();
+    }
+
+
+    function escaparHtml(texto) {
+      return String(texto ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function validarYNormalizarHorario(valor) {
+      const original = (valor || '').trim();
+      if (!original) {
+        return { valido: false, vacio: true, valor: '', original: '' };
+      }
+
+      // La celda completa debe ser un rango horario. Si contiene leyendas como
+      // "HORARIO ESPECIAL", observaciones u otro texto, se considera inválida.
+      const limpio = original
+        .toUpperCase()
+        .replace(/HRS?\.?/g, '')
+        .replace(/HORAS?\.?/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const match = limpio.match(/^(\d{1,2}):(\d{2})\s*(?:A|-)\s*(\d{1,2}):(\d{2})$/);
+      if (!match) {
+        return { valido: false, vacio: false, valor: '', original };
+      }
+
+      const h1 = Number(match[1]);
+      const m1 = Number(match[2]);
+      const h2 = Number(match[3]);
+      const m2 = Number(match[4]);
+      const horaValida = (h, m) => h >= 0 && h <= 24 && m >= 0 && m <= 59 && !(h === 24 && m !== 0);
+
+      if (!horaValida(h1, m1) || !horaValida(h2, m2)) {
+        return { valido: false, vacio: false, valor: '', original };
+      }
+
+      const hhmm = (h, m) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      return {
+        valido: true,
+        vacio: false,
+        valor: `${hhmm(h1, m1)} A ${hhmm(h2, m2)}HRS`,
+        original
+      };
+    }
+
+    function obtenerRegional(regionRaw) {
+      const norm = normalizar(regionRaw);
+      if (!norm) return null;
+
+      for (const regional of REGIONALES) {
+        const coincide = regional.aliases.some(alias => {
+          const aliasNorm = normalizar(alias);
+          return norm === aliasNorm || norm.includes(aliasNorm);
+        });
+        if (coincide) return regional.nombre;
+      }
+      return null;
+    }
+
+    function esCoordinadora(nombrePersona) {
+      const pNorm = normalizar(nombrePersona).split(/\s+/).filter(w => w.length > 2);
+      if (pNorm.length === 0) return false;
+
+      for (const coord of COORDINADORAS) {
+        const cNorm = normalizar(coord).split(/\s+/).filter(w => w.length > 2);
+        
+        if (normalizar(nombrePersona) === normalizar(coord) || normalizar(nombrePersona).includes(normalizar(coord))) {
+          return true;
+        }
+
+        const primerNombreP = pNorm[0];
+        const coincidePrimerNombre = cNorm.some(w => w === primerNombreP);
+        
+        if (coincidePrimerNombre) {
+          const apellidosP = pNorm.slice(1);
+          const apellidosC = cNorm.slice(1);
+          const comparteApellido = apellidosP.some(ap => apellidosC.includes(ap));
+          if (comparteApellido) return true;
+        }
+      }
+      return false;
+    }
+
+    function letraDiaFecha(fecha) {
+      // Date.getDay(): 0 domingo, 1 lunes, 2 martes, ... 6 sábado.
+      return ['D', 'L', 'M', 'M', 'J', 'V', 'S'][fecha.getDay()];
+    }
+
+    function sumarDias(fecha, dias) {
+      const copia = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+      copia.setDate(copia.getDate() + dias);
+      return copia;
+    }
+
+    function inicioDelDia(fecha) {
+      return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
+    }
+
+    function resolverFechasReales(dayCols) {
+      // Busca una semana real cercana a la fecha actual que coincida simultáneamente
+      // con los números y las letras de día pegados desde Excel. Así el mes/año ya
+      // no se "adivina" con el mes actual: se infiere del calendario real.
+      if (!dayCols || dayCols.length === 0) return null;
+
+      const primerNumero = parseInt(dayCols[0].num, 10);
+      if (isNaN(primerNumero) || primerNumero < 1 || primerNumero > 31) return null;
+
+      const hoy = inicioDelDia(new Date());
+      const candidatos = [];
+      const RADIO_BUSQUEDA_DIAS = 370;
+
+      for (let offset = -RADIO_BUSQUEDA_DIAS; offset <= RADIO_BUSQUEDA_DIAS; offset++) {
+        const inicio = sumarDias(hoy, offset);
+        if (inicio.getDate() !== primerNumero) continue;
+        if (dayCols[0].letter && letraDiaFecha(inicio) !== dayCols[0].letter) continue;
+
+        let valido = true;
+        const fechas = [];
+
+        for (let i = 0; i < dayCols.length; i++) {
+          const fecha = sumarDias(inicio, i);
+          const numeroEsperado = parseInt(dayCols[i].num, 10);
+
+          if (!isNaN(numeroEsperado) && numeroEsperado !== fecha.getDate()) {
+            valido = false;
+            break;
+          }
+          if (dayCols[i].letter && letraDiaFecha(fecha) !== dayCols[i].letter) {
+            valido = false;
+            break;
+          }
+          fechas.push(fecha);
+        }
+
+        if (valido) {
+          candidatos.push({
+            fechas,
+            distancia: Math.abs(offset),
+            // En empate exacto se prefiere la semana futura, útil al preparar roles.
+            esFuturo: offset >= 0
+          });
+        }
+      }
+
+      if (candidatos.length === 0) return null;
+
+      candidatos.sort((a, b) => {
+        if (a.distancia !== b.distancia) return a.distancia - b.distancia;
+        return Number(b.esFuturo) - Number(a.esFuturo);
+      });
+
+      return candidatos[0].fechas;
+    }
+
+    function completarCalendario(dayCols) {
+      let cols = dayCols.map(d => ({ ...d }));
+      let fechas = resolverFechasReales(cols);
+      let lunesGenerado = false;
+
+      const indicePorDia = (nombreDia) => cols.findIndex(d => nombreDiaDesdeHeader(d.raw) === nombreDia);
+
+      // Si falta LUNES pero existe MARTES, genera el lunes restando un día real
+      // a la fecha de MARTES. Esto permite cruzar correctamente al mes anterior
+      // (por ejemplo: MARTES 1 -> LUNES 31 del mes anterior).
+      if (indicePorDia('LUNES') === -1 && indicePorDia('MARTES') !== -1) {
+        const idxMartes = indicePorDia('MARTES');
+        let fechaMartes = fechas && fechas[idxMartes] ? fechas[idxMartes] : null;
+
+        // Respaldo: resuelve MARTES de forma individual si la secuencia completa
+        // no pudo vincularse todavía con el calendario.
+        if (!fechaMartes) {
+          const martes = cols[idxMartes];
+          const fechaMartesUnica = resolverFechasReales([{ ...martes, letter: 'M' }]);
+          if (fechaMartesUnica && fechaMartesUnica[0]) fechaMartes = fechaMartesUnica[0];
+        }
+
+        if (fechaMartes) {
+          const fechaLunes = sumarDias(fechaMartes, -1);
+          cols.splice(idxMartes, 0, {
+            colIdx: -1,
+            raw: 'LUNES ' + fechaLunes.getDate(),
+            letter: 'L',
+            num: String(fechaLunes.getDate()),
+            fecha: fechaLunes,
+            generado: true
+          });
+          lunesGenerado = true;
+          fechas = resolverFechasReales(cols);
+        }
+      }
+
+      // Si no viene DOMINGO, se genera a partir del sábado usando calendario real.
+      // No depende del número de columnas, porque LUNES también puede haber sido generado.
+      if (indicePorDia('DOMINGO') === -1 && indicePorDia('SABADO') !== -1) {
+        const idxSabado = indicePorDia('SABADO');
+        let fechaSabado = fechas && fechas[idxSabado] ? fechas[idxSabado] : null;
+
+        if (!fechaSabado) {
+          const sabado = cols[idxSabado];
+          const fechaSabadoUnica = resolverFechasReales([{ ...sabado, letter: 'S' }]);
+          if (fechaSabadoUnica && fechaSabadoUnica[0]) fechaSabado = fechaSabadoUnica[0];
+        }
+
+        let fechaDomingo = fechaSabado ? sumarDias(fechaSabado, 1) : null;
+        let nextNumStr = '';
+
+        if (fechaDomingo) {
+          nextNumStr = String(fechaDomingo.getDate());
+        } else {
+          const lastNum = parseInt(cols[idxSabado].num, 10);
+          nextNumStr = !isNaN(lastNum) ? String(lastNum === 31 ? 1 : lastNum + 1) : '';
+        }
+
+        cols.splice(idxSabado + 1, 0, {
+          colIdx: -1,
+          raw: 'DOMINGO ' + nextNumStr,
+          letter: 'D',
+          num: nextNumStr,
+          fecha: fechaDomingo || undefined,
+          generado: true
+        });
+
+        fechas = resolverFechasReales(cols);
+      }
+
+      // Si no hay números de día utilizables, usa la semana real actual empezando
+      // en lunes para no inventar fechas artificiales.
+      if (!fechas && cols.every(d => !d.num || isNaN(parseInt(d.num, 10)))) {
+        const hoy = inicioDelDia(new Date());
+        const desplazamientoALunes = (hoy.getDay() + 6) % 7;
+        const lunes = sumarDias(hoy, -desplazamientoALunes);
+        fechas = cols.map((_, i) => sumarDias(lunes, i));
+        cols.forEach((d, i) => {
+          d.num = String(fechas[i].getDate());
+          d.letter = letraDiaFecha(fechas[i]);
+        });
+      }
+
+      if (fechas) {
+        cols.forEach((d, i) => {
+          if (!fechas[i]) return;
+          d.num = String(fechas[i].getDate());
+          d.fecha = fechas[i];
+        });
+      }
+
+      return { dayCols: cols, fechas, lunesGenerado };
+    }
+
+    function obtenerIndiceInicioMes(dayCols) {
+      // Prioriza las fechas reales cuando están disponibles.
+      for (let i = 1; i < dayCols.length; i++) {
+        const anterior = dayCols[i - 1].fecha;
+        const actual = dayCols[i].fecha;
+        if (anterior instanceof Date && actual instanceof Date &&
+            (anterior.getMonth() !== actual.getMonth() || anterior.getFullYear() !== actual.getFullYear())) {
+          return i;
+        }
+      }
+
+      // Respaldo para datos que no pudieron vincularse a una fecha real.
+      for (let i = 1; i < dayCols.length; i++) {
+        const prev = parseInt(dayCols[i - 1].num, 10);
+        const curr = parseInt(dayCols[i].num, 10);
+        if (!isNaN(prev) && !isNaN(curr) && curr < prev) return i;
+      }
+      return 0;
+    }
+
+    function calcularPeriodoAutomatico(dayCols) {
+      const fechas = dayCols.map(d => d.fecha).filter(f => f instanceof Date);
+
+      if (fechas.length > 0) {
+        const primera = fechas[0];
+        const ultima = fechas[fechas.length - 1];
+        const mismoMes = primera.getMonth() === ultima.getMonth() && primera.getFullYear() === ultima.getFullYear();
+        const mismoAnio = primera.getFullYear() === ultima.getFullYear();
+
+        if (mismoMes) {
+          return MESES[primera.getMonth()] + ' ' + primera.getFullYear();
+        }
+        if (mismoAnio) {
+          return MESES[primera.getMonth()] + ' - ' + MESES[ultima.getMonth()] + ' ' + ultima.getFullYear();
+        }
+        return MESES[primera.getMonth()] + ' ' + primera.getFullYear() +
+          ' - ' + MESES[ultima.getMonth()] + ' ' + ultima.getFullYear();
+      }
+
+      // Último respaldo: conserva el comportamiento anterior si los encabezados
+      // no proporcionan información suficiente para inferir fechas.
+      const now = new Date();
+      const mesActualIdx = now.getMonth();
+      const anioActual = now.getFullYear();
+      const indiceCruce = obtenerIndiceInicioMes(dayCols);
+
+      if (indiceCruce > 0) {
+        const mesSiguienteIdx = (mesActualIdx + 1) % 12;
+        const anioFinal = (mesActualIdx === 11) ? anioActual + 1 : anioActual;
+        if (anioFinal !== anioActual) {
+          return MESES[mesActualIdx] + ' ' + anioActual + ' - ' + MESES[mesSiguienteIdx] + ' ' + anioFinal;
+        }
+        return MESES[mesActualIdx] + ' - ' + MESES[mesSiguienteIdx] + ' ' + anioFinal;
+      }
+      return MESES[mesActualIdx] + ' ' + anioActual;
+    }
+
+    function indiceAColumnaExcel(idx) {
+      let n = idx + 1;
+      let letras = '';
+      while (n > 0) {
+        const rem = (n - 1) % 26;
+        letras = String.fromCharCode(65 + rem) + letras;
+        n = Math.floor((n - 1) / 26);
+      }
+      return letras;
+    }
+
+    function nombreDiaDesdeHeader(header) {
+      const norm = normalizar(header);
+      if (norm.startsWith('LUN')) return 'LUNES';
+      if (norm.startsWith('MAR')) return 'MARTES';
+      if (norm.startsWith('MIE')) return 'MIERCOLES';
+      if (norm.startsWith('JUE')) return 'JUEVES';
+      if (norm.startsWith('VIE')) return 'VIERNES';
+      if (norm.startsWith('SAB')) return 'SABADO';
+      if (norm.startsWith('DOM')) return 'DOMINGO';
+      return null;
+    }
+
+    function pareceDatoDeHorario(valor) {
+      const original = (valor || '').trim();
+      if (!original) return false;
+      const norm = normalizar(original);
+      if (norm.includes('HORARIO')) return true;
+      const limpio = original
+        .toUpperCase()
+        .replace(/HRS?\.?/g, '')
+        .replace(/HORAS?\.?/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      return /^\d{1,2}:\d{2}\s*(?:A|-)\s*\d{1,2}:\d{2}$/.test(limpio);
+    }
+
+    function analizarEstructuraColumnas(headers, lines, startDataIdx) {
+      const errores = [];
+      const indicesRegion = [];
+      const indicesNombre = [];
+      const indicesHorario = [];
+      const dias = new Map();
+
+      headers.forEach((h, idx) => {
+        const norm = normalizar(h);
+        if (!norm) return;
+        if (norm.includes('REGION')) indicesRegion.push(idx);
+        if (norm.includes('PROMOTOR') || norm.includes('NOMBRE')) indicesNombre.push(idx);
+        if (norm.includes('HORARIO')) indicesHorario.push(idx);
+        const dia = nombreDiaDesdeHeader(h);
+        if (dia) {
+          if (!dias.has(dia)) dias.set(dia, []);
+          dias.get(dia).push(idx);
+        }
+      });
+
+      if (indicesRegion.length === 0) errores.push('No se encontró la columna REGION. Es necesaria para asignar correctamente al supervisor regional.');
+      if (indicesNombre.length === 0) errores.push('No se encontró la columna NOMBRE DEL PROMOTOR.');
+      if (indicesHorario.length === 0) errores.push('No se encontró una columna llamada HORARIO.');
+      if (indicesRegion.length > 1) errores.push(`Se detectaron ${indicesRegion.length} columnas de REGION. Debe existir sólo una.`);
+      if (indicesNombre.length > 1) errores.push(`Se detectaron ${indicesNombre.length} columnas que parecen ser NOMBRE DEL PROMOTOR. Debe existir sólo una.`);
+      if (indicesHorario.length > 1) errores.push(`Se detectaron ${indicesHorario.length} columnas que contienen HORARIO. Debe existir sólo una.`);
+
+      // LUNES es opcional: si falta, se genera automáticamente a partir de MARTES.
+      const diasObligatorios = ['MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+      diasObligatorios.forEach(dia => {
+        const cols = dias.get(dia) || [];
+        if (cols.length === 0) errores.push(`Falta la columna ${dia}.`);
+        if (cols.length > 1) {
+          const refs = cols.map(i => `${indiceAColumnaExcel(i)} (\"${headers[i]}\")`).join(', ');
+          errores.push(`El día ${dia} aparece más de una vez: ${refs}.`);
+        }
+      });
+      const lunesCols = dias.get('LUNES') || [];
+      if (lunesCols.length > 1) {
+        const refs = lunesCols.map(i => `${indiceAColumnaExcel(i)} ("${headers[i]}")`).join(', ');
+        errores.push(`LUNES aparece más de una vez: ${refs}.`);
+      }
+
+      const domingoCols = dias.get('DOMINGO') || [];
+      if (domingoCols.length > 1) {
+        const refs = domingoCols.map(i => `${indiceAColumnaExcel(i)} (\"${headers[i]}\")`).join(', ');
+        errores.push(`DOMINGO aparece más de una vez: ${refs}.`);
+      }
+
+      // Si falta HORARIO, buscamos si alguna columna etiquetada como día contiene
+      // en realidad horarios. Esto detecta casos como encabezado DOMINGO sobre una
+      // columna cuyos datos son "17:00 A 24:00 HRS.".
+      if (indicesHorario.length === 0) {
+        for (const [dia, cols] of dias.entries()) {
+          for (const idx of cols) {
+            const valores = [];
+            for (let r = startDataIdx; r < lines.length; r++) {
+              const v = (lines[r] && lines[r][idx] ? lines[r][idx] : '').trim();
+              if (v) valores.push(v);
+            }
+            if (valores.length === 0) continue;
+            const horarios = valores.filter(pareceDatoDeHorario);
+            const ratio = horarios.length / valores.length;
+            if (horarios.length >= 2 && ratio >= 0.6) {
+              const muestra = horarios.slice(0, 2).map(v => `\"${v}\"`).join(', ');
+              errores.push(`La columna ${indiceAColumnaExcel(idx)} (\"${headers[idx]}\") está identificada como ${dia}, pero ${horarios.length} de ${valores.length} valores parecen horarios (${muestra}). Probablemente el encabezado correcto de esa columna sea HORARIO.`);
+            }
+          }
+        }
+      }
+
+      return errores;
+    }
+
+    function renderStructureErrors(errores) {
+      const box = document.getElementById('structureErrorsBox');
+      if (!errores || errores.length === 0) {
+        box.classList.remove('visible');
+        box.innerHTML = '';
+        return;
+      }
+      const items = errores.map(e => `<li>${escaparHtml(e)}</li>`).join('');
+      box.innerHTML = `
+        <div class=\"structure-errors-title\">⛔ No se generó el archivo: la estructura de columnas necesita corrección</div>
+        <div class=\"structure-errors-help\">Corrige los encabezados indicados en el rol original y vuelve a pegar la tabla.</div>
+        <ul class=\"structure-errors-list\">${items}</ul>
+      `;
+      box.classList.add('visible');
+    }
+
+    function procesarDatos() {
+      const rawText = document.getElementById('rawInput').value.trim();
+      renderStructureErrors([]);
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('btnExport').style.display = 'none';
+      processedOutput = null;
+      if (!rawText) {
+        alert('Por favor pega el contenido de la tabla de Excel.');
+        return;
+      }
+
+      const lines = rawText.split(/\r?\n/).map(l => l.split('\t').map(c => c.trim()));
+      if (lines.length < 1) {
+        alert('No se encontraron líneas válidas.');
+        return;
+      }
+
+      let headerIdx = -1;
+      for (let i = 0; i < lines.length; i++) {
+        const rowJoin = lines[i].map(c => normalizar(c)).join(' ');
+        if (rowJoin.includes('REGION') || rowJoin.includes('PROMOTOR') || rowJoin.includes('LUNES') || rowJoin.includes('MARTES')) {
+          headerIdx = i;
+          break;
+        }
+      }
+
+      let headers = [];
+      let startDataIdx = 0;
+
+      if (headerIdx !== -1) {
+        headers = lines[headerIdx];
+        startDataIdx = headerIdx + 1;
+      } else {
+        renderStructureErrors(['No se pudo identificar la fila de encabezados. Debe incluir REGION, NOMBRE DEL PROMOTOR, los días de LUNES a SABADO y HORARIO.']);
+        return;
+      }
+
+      const erroresEstructura = analizarEstructuraColumnas(headers, lines, startDataIdx);
+      if (erroresEstructura.length > 0) {
+        renderStructureErrors(erroresEstructura);
+        return;
+      }
+
+      let idxRegion = -1, idxNombre = -1, idxHorario = -1;
+      let rawDayCols = [];
+
+      if (headers.length > 0) {
+        headers.forEach((h, idx) => {
+          const norm = normalizar(h);
+          if (norm.includes('REGION')) idxRegion = idx;
+          else if (norm.includes('PROMOTOR') || norm.includes('NOMBRE')) idxNombre = idx;
+          else if (norm.includes('HORARIO')) idxHorario = idx;
+          else if (/^(LUN|MAR|MIE|MIÉ|JUE|VIE|SAB|SÁB|DOM)/.test(norm)) {
+            const matchDay = norm.match(/([A-ZÁÉÍÓÚ]+)\s*(\d+)?/);
+            let letter = norm.substring(0, 1);
+            let num = '';
+            if (matchDay) {
+              const dayName = matchDay[1];
+              if (dayName.startsWith('LUN')) letter = 'L';
+              else if (dayName.startsWith('MAR')) letter = 'M';
+              else if (dayName.startsWith('MIE') || dayName.startsWith('MIÉ')) letter = 'M';
+              else if (dayName.startsWith('JUE')) letter = 'J';
+              else if (dayName.startsWith('VIE')) letter = 'V';
+              else if (dayName.startsWith('SAB') || dayName.startsWith('SÁB')) letter = 'S';
+              else if (dayName.startsWith('DOM')) letter = 'D';
+              if (matchDay[2]) num = matchDay[2];
+            }
+            rawDayCols.push({ colIdx: idx, raw: h, letter: letter, num: num });
+          }
+        });
+      }
+
+      // La estructura ya fue validada; no se adivinan columnas faltantes.
+
+      const calendario = completarCalendario(rawDayCols);
+      const dayCols = calendario.dayCols;
+
+      const avisosCalendario = [];
+      if (calendario.lunesGenerado) {
+        const lunes = dayCols.find(d => nombreDiaDesdeHeader(d.raw) === 'LUNES');
+        if (lunes) {
+          avisosCalendario.push(`No venía la columna LUNES. Se generó automáticamente como LUNES ${lunes.num} y se dejó vacía para todas las personas.`);
+        }
+      }
+
+      const periodoFinal = calcularPeriodoAutomatico(dayCols);
+      document.getElementById('monthDisplay').textContent = periodoFinal;
+
+      const promotorasRows = [];
+      const regionalesMap = new Map();
+      const warnings = [];
+      const warningsKeys = new Set();
+      let countCoordinadoras = 0;
+
+      for (let r = startDataIdx; r < lines.length; r++) {
+        const row = lines[r];
+        if (!row || row.length <= 1 || !row.some(c => c.trim() !== '')) continue;
+
+        const region = row[idxRegion] || '';
+        const nombre = row[idxNombre] || '';
+        if (!nombre) continue;
+
+        const horarioRaw = (idxHorario !== -1 && row[idxHorario]) ? row[idxHorario] : '';
+        const horarioEvaluado = validarYNormalizarHorario(horarioRaw);
+        const horarioClean = horarioEvaluado.valido ? horarioEvaluado.valor : '';
+
+        const esCoord = esCoordinadora(nombre);
+        if (esCoord) countCoordinadoras++;
+
+        const motivoVisita = esCoord ? 'Visita de Supervisión' : 'Promoción de marca';
+        const actividades = esCoord ? 'Promoción de juegos nuevos' : 'Promoción de la Marca';
+        const horarioFinal = horarioClean
+          ? (esCoord ? ('Abierto de ' + horarioClean) : horarioClean)
+          : '';
+
+        const salasInRow = new Set();
+        const diasPorSala = {};
+
+        dayCols.forEach((d, dIdx) => {
+          if (d.colIdx === -1 || d.colIdx >= row.length) return;
+          const val = row[d.colIdx] ? row[d.colIdx].trim() : '';
+          const valNorm = normalizar(val);
+          const esSinVisita = valNorm === 'DESCANSO' || valNorm === 'FESTIVO';
+          if (val && val !== '-' && val !== '0' && !esSinVisita) {
+            const sala = val.toUpperCase();
+            salasInRow.add(sala);
+            if (!diasPorSala[sala]) diasPorSala[sala] = Array(dayCols.length).fill('');
+            diasPorSala[sala][dIdx] = 'X';
+          }
+        });
+
+        salasInRow.forEach(sala => {
+          if (!horarioEvaluado.valido) {
+            const textoProblema = horarioEvaluado.vacio ? '[VACÍO]' : horarioEvaluado.original;
+            const warningKey = `${normalizar(nombre)}___${normalizar(sala)}___${textoProblema}`;
+            if (!warningsKeys.has(warningKey)) {
+              warningsKeys.add(warningKey);
+              warnings.push({
+                sala,
+                nombre,
+                texto: textoProblema,
+                vacio: horarioEvaluado.vacio
+              });
+            }
+          }
+
+          const rowData = {
+            tipo: esCoord ? 'COORDINADORA' : 'PROMOTORA',
+            sala: sala,
+            nombre: nombre,
+            motivo: motivoVisita,
+            actividades: actividades,
+            marca: 'ZITRO',
+            horario: horarioFinal,
+            dias: diasPorSala[sala] || Array(dayCols.length).fill('')
+          };
+          promotorasRows.push(rowData);
+
+          const regionalNombre = obtenerRegional(region);
+          if (regionalNombre && normalizar(regionalNombre) !== normalizar(nombre)) {
+            const regKey = regionalNombre + '___' + sala;
+            if (!regionalesMap.has(regKey)) {
+              regionalesMap.set(regKey, {
+                tipo: 'REGIONAL',
+                sala: sala,
+                nombre: regionalNombre,
+                motivo: 'Visita de Supervisión',
+                actividades: 'Promoción de juegos nuevos',
+                marca: 'ZITRO',
+                horario: horarioClean ? ('Abierto de ' + horarioClean) : '',
+                dias: Array(dayCols.length).fill('')
+              });
+            }
+            const regRow = regionalesMap.get(regKey);
+            (diasPorSala[sala] || []).forEach((xVal, dIdx) => {
+              if (xVal === 'X') regRow.dias[dIdx] = 'X';
+            });
+          }
+        });
+      }
+
+      const regionalesRows = Array.from(regionalesMap.values());
+      const allRows = [...promotorasRows, ...regionalesRows];
+
+      processedOutput = {
+        monthYear: periodoFinal,
+        dayCols: dayCols,
+        rows: allRows,
+        warnings: warnings,
+        avisosCalendario: avisosCalendario,
+        stats: {
+          totalFilas: allRows.length,
+          promotoras: promotorasRows.filter(r => r.tipo === 'PROMOTORA').length,
+          coordinadoras: countCoordinadoras,
+          regionales: regionalesRows.length
+        }
+      };
+
+      renderPreview(processedOutput);
+      renderStats(processedOutput.stats);
+      renderWarnings(processedOutput.warnings, processedOutput.avisosCalendario);
+      document.getElementById('btnExport').style.display = 'inline-flex';
+      document.getElementById('resultCard').style.display = 'block';
+    }
+
+    function renderStats(stats) {
+      document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-label">TOTAL REGISTROS</div>
+          <div class="stat-value" style="color: #38bdf8;">${stats.totalFilas}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">PROMOTORAS</div>
+          <div class="stat-value" style="color: #4ade80;">${stats.promotoras}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">COORDINADORAS DETECTADAS</div>
+          <div class="stat-value" style="color: #f43f5e;">${stats.coordinadoras}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SUPERVISORES REGIONALES</div>
+          <div class="stat-value" style="color: #a855f7;">${stats.regionales}</div>
+        </div>
+      `;
+    }
+
+    function renderWarnings(warnings, avisosCalendario = []) {
+      const box = document.getElementById('warningsBox');
+      const hayHorarios = warnings && warnings.length > 0;
+      const hayCalendario = avisosCalendario && avisosCalendario.length > 0;
+
+      if (!hayHorarios && !hayCalendario) {
+        box.classList.remove('visible');
+        box.innerHTML = '';
+        return;
+      }
+
+      let contenido = '';
+
+      if (hayCalendario) {
+        const itemsCalendario = avisosCalendario.map(a => `<li>${escaparHtml(a)}</li>`).join('');
+        contenido += `
+          <div class="warnings-title">ℹ Ajustes automáticos del calendario</div>
+          <ul class="warnings-list">${itemsCalendario}</ul>
+        `;
+      }
+
+      if (hayHorarios) {
+        const items = warnings.map(w => {
+          const texto = w.vacio ? 'la celda está vacía' : `contiene el texto <span class="warning-raw">"${escaparHtml(w.texto)}"</span>`;
+          return `<li>El horario para la sala <strong>${escaparHtml(w.sala)}</strong> (${escaparHtml(w.nombre)}) ${texto}. Favor de verificar en el archivo generado; el horario se dejó vacío.</li>`;
+        }).join('');
+
+        contenido += `
+          <div class="warnings-title" style="margin-top:${hayCalendario ? '12px' : '0'};">⚠ Horarios que requieren revisión (${warnings.length})</div>
+          <ul class="warnings-list">${items}</ul>
+        `;
+      }
+
+      box.innerHTML = contenido;
+      box.classList.add('visible');
+    }
+
+    function renderPreview(data) {
+      let html = '<table>';
+      html += `<tr>
+        <th class="main-header" colspan="6">ACCESOS WINPOT</th>
+        <th class="col-hidden-sep" rowspan="3"></th>
+        <th class="main-header" colspan="${data.dayCols.length}">${data.monthYear}</th>
+      </tr>`;
+
+      html += `<tr>
+        <th class="sub-header" rowspan="2">SALA</th>
+        <th class="sub-header" rowspan="2">NOMBRE</th>
+        <th class="sub-header" rowspan="2">MOTIVO DE VISITA</th>
+        <th class="sub-header" rowspan="2">ACTIVIDADES</th>
+        <th class="sub-header" rowspan="2">MARCA</th>
+        <th class="sub-header" rowspan="2">HORARIO</th>`;
+
+      // Letras de los días: azul claro / azul oscuro alternados
+      data.dayCols.forEach((d, idx) => {
+        const claseLetra = (idx % 2 === 0) ? 'day-header-light' : 'day-header-dark';
+        html += `<th class="day-header ${claseLetra}">${d.letter}</th>`;
+      });
+
+      html += `</tr><tr>`;
+
+      // Números: si existe cruce de mes, los días del mes anterior
+      // quedan en azul claro; los del mes principal, en azul oscuro.
+      const indiceInicioMes = obtenerIndiceInicioMes(data.dayCols);
+      data.dayCols.forEach((d, idx) => {
+        const claseNumero = (indiceInicioMes > 0 && idx < indiceInicioMes)
+          ? 'day-header-light'
+          : 'day-header-dark';
+        html += `<th class="day-header ${claseNumero}">${d.num}</th>`;
+      });
+      html += `</tr>`;
+
+      data.rows.forEach(r => {
+        const badge = r.tipo === 'COORDINADORA' ? '<span class="tag-coord">COORD</span>' : '';
+        html += `<tr>
+          <td class="win-cell text-left"><strong>${r.sala}</strong></td>
+          <td class="win-cell text-left">${r.nombre}${badge}</td>
+          <td class="win-cell">${r.motivo}</td>
+          <td class="win-cell">${r.actividades}</td>
+          <td class="win-cell">${r.marca}</td>
+          <td class="win-cell">${r.horario}</td>
+          <td class="col-hidden-sep"></td>`;
+        r.dias.forEach(d => {
+          html += `<td class="day-cell">${d}</td>`;
+        });
+        html += `</tr>`;
+      });
+
+      html += '</table>';
+      document.getElementById('previewContainer').innerHTML = html;
+    }
+
+    async function exportarExcel() {
+      if (!processedOutput) return;
+
+      const wb = new ExcelJS.Workbook();
+      wb.creator = 'ZITRO';
+      wb.created = new Date();
+
+      const ws = wb.addWorksheet('WINPOT', {
+        views: [{ showGridLines: false }]
+      });
+
+      // Paleta oficial tomada de la tabla de referencia
+      const fillHeaderNavy = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002060' } }; // #002060
+      const fillSubHeader = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF333F4F' } };  // #333F4F
+      const fillDayDark = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F4E78' } };   // #1F4E78
+      const fillDayLight = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF8EA9DB' } };  // #8EA9DB
+      const fillDataBlue = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBDD7EE' } };  // #BDD7EE
+
+      const fontWhiteBold11 = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFFFFFFF' } };
+      const fontWhiteBold10 = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+      const fontDataBlack = { name: 'Calibri', size: 10, color: { argb: 'FF000000' } };
+      const fontDataBlackBold = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF000000' } };
+
+      const borderWhiteMedium = {
+        top: { style: 'medium', color: { argb: 'FFFFFFFF' } },
+        bottom: { style: 'medium', color: { argb: 'FFFFFFFF' } },
+        left: { style: 'medium', color: { argb: 'FFFFFFFF' } },
+        right: { style: 'medium', color: { argb: 'FFFFFFFF' } }
+      };
+
+      // 1. Escribir Encabezados de Columna 1 (A) a 77 (BY)
+      // Fila 1 (A1:F1 y BS1:BY1)
+      const r1 = ws.getRow(1);
+      r1.getCell(1).value = 'ACCESOS WINPOT';
+      r1.getCell(71).value = processedOutput.monthYear; // BS1 (Columnas 7 a 70 vacías)
+
+      // Fila 2 (Subencabezados A2:F2 y Letras de Días BS2:BY2)
+      const r2 = ws.getRow(2);
+      r2.getCell(1).value = 'SALA';
+      r2.getCell(2).value = 'NOMBRE';
+      r2.getCell(3).value = 'MOTIVO DE VISITA';
+      r2.getCell(4).value = 'ACTIVIDADES';
+      r2.getCell(5).value = 'MARCA';
+      r2.getCell(6).value = 'HORARIO';
+      processedOutput.dayCols.forEach((d, idx) => {
+        if (71 + idx <= 77) r2.getCell(71 + idx).value = d.letter;
+      });
+
+      // Fila 3 (Números de Días como ENTEROS numéricos)
+      const r3 = ws.getRow(3);
+      processedOutput.dayCols.forEach((d, idx) => {
+        if (71 + idx <= 77) {
+          const dayNum = parseInt(d.num, 10);
+          r3.getCell(71 + idx).value = isNaN(dayNum) ? d.num : dayNum;
+        }
+      });
+
+      // 2. Escribir filas de datos
+      processedOutput.rows.forEach((r, rIdx) => {
+        const rowNum = 4 + rIdx;
+        const row = ws.getRow(rowNum);
+        row.getCell(1).value = r.sala;
+        row.getCell(2).value = r.nombre;
+        row.getCell(3).value = r.motivo;
+        row.getCell(4).value = r.actividades;
+        row.getCell(5).value = r.marca;
+        row.getCell(6).value = r.horario;
+        r.dias.forEach((dVal, dIdx) => {
+          if (71 + dIdx <= 77) {
+            row.getCell(71 + dIdx).value = dVal || '';
+          }
+        });
+      });
+
+      // 3. Merges de Título y Unificación Vertical de Encabezados (A2:A3, B2:B3, etc.)
+      ws.mergeCells(1, 1, 1, 6);   // A1:F1
+      ws.mergeCells(1, 71, 1, 77); // BS1:BY1
+      
+      // Unificación de celdas verticales para eliminar la línea divisoria horizontal
+      ws.mergeCells(2, 1, 3, 1); // SALA (A2:A3)
+      ws.mergeCells(2, 2, 3, 2); // NOMBRE (B2:B3)
+      ws.mergeCells(2, 3, 3, 3); // MOTIVO DE VISITA (C2:C3)
+      ws.mergeCells(2, 4, 3, 4); // ACTIVIDADES (D2:D3)
+      ws.mergeCells(2, 5, 3, 5); // MARCA (E2:E3)
+      ws.mergeCells(2, 6, 3, 6); // HORARIO (F2:F3)
+
+      // 4. Anchos y Ocultar Columnas G a BR (7 a 70) completamente limpias
+      const widths = [33, 35, 23, 29, 12, 28];
+      for (let c = 1; c <= 6; c++) {
+        const col = ws.getColumn(c);
+        col.width = widths[c - 1];
+        col.hidden = false;
+      }
+      for (let c = 7; c <= 70; c++) {
+        const col = ws.getColumn(c);
+        col.hidden = true; // OCULTA: Genera la separación F || BS sin texto residual
+        col.width = 0.64;
+      }
+      for (let c = 71; c <= 77; c++) {
+        const col = ws.getColumn(c);
+        col.width = 4.8;
+        col.hidden = false;
+      }
+
+      // 5. Aplicar Estilos Celda por Celda
+      // Fila 1 (A1:F1 y BS1:BY1)
+      for (let c = 1; c <= 6; c++) {
+        const cell = ws.getCell(1, c);
+        cell.fill = fillHeaderNavy;
+        cell.font = fontWhiteBold11;
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+      for (let c = 71; c <= 77; c++) {
+        const cell = ws.getCell(1, c);
+        cell.fill = fillHeaderNavy;
+        cell.font = fontWhiteBold11;
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+      }
+
+      // Filas 2 y 3 (Encabezados A-F combinados sin división)
+      for (let c = 1; c <= 6; c++) {
+        for (let r = 2; r <= 3; r++) {
+          const cell = ws.getCell(r, c);
+          cell.fill = fillSubHeader;
+          cell.font = fontWhiteBold10;
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = borderWhiteMedium;
+        }
+      }
+
+      // Días BS-BY
+      // Fila 2: letras alternadas azul claro / azul oscuro
+      processedOutput.dayCols.forEach((d, idx) => {
+        const c = 71 + idx;
+        if (c > 77) return;
+
+        const cell = ws.getCell(2, c);
+        cell.fill = (idx % 2 === 0) ? fillDayLight : fillDayDark;
+        cell.font = fontWhiteBold10;
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderWhiteMedium;
+      });
+
+      // Fila 3: días del mes anterior en azul claro y del mes principal en azul oscuro
+      const indiceInicioMesExcel = obtenerIndiceInicioMes(processedOutput.dayCols);
+      processedOutput.dayCols.forEach((d, idx) => {
+        const c = 71 + idx;
+        if (c > 77) return;
+
+        const cell = ws.getCell(3, c);
+        cell.fill = (indiceInicioMesExcel > 0 && idx < indiceInicioMesExcel)
+          ? fillDayLight
+          : fillDayDark;
+        cell.font = fontWhiteBold10;
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = borderWhiteMedium;
+      });
+
+      // Filas de Datos (Fila 4 en adelante)
+      const totalRows = 3 + processedOutput.rows.length;
+      for (let r = 4; r <= totalRows; r++) {
+        for (let c = 1; c <= 6; c++) {
+          const cell = ws.getCell(r, c);
+          cell.fill = fillDataBlue;
+          cell.font = fontDataBlack;
+          cell.alignment = (c === 1 || c === 2) 
+            ? { horizontal: 'left', vertical: 'middle' } 
+            : { horizontal: 'center', vertical: 'middle' };
+          cell.border = borderWhiteMedium;
+        }
+        for (let c = 71; c <= 77; c++) {
+          const cell = ws.getCell(r, c);
+          cell.fill = fillDataBlue;
+          cell.font = fontDataBlackBold;
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = borderWhiteMedium;
+        }
+      }
+
+      // 6. Guardar archivo Excel nativo
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, 'ACCESOS_WINPOT.xlsx');
+    }
+
+    function limpiar() {
+      document.getElementById('rawInput').value = '';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('btnExport').style.display = 'none';
+      const warningsBox = document.getElementById('warningsBox');
+      warningsBox.classList.remove('visible');
+      warningsBox.innerHTML = '';
+      const structureErrorsBox = document.getElementById('structureErrorsBox');
+      structureErrorsBox.classList.remove('visible');
+      structureErrorsBox.innerHTML = '';
+      const now = new Date();
+      document.getElementById('monthDisplay').textContent = MESES[now.getMonth()] + ' ' + now.getFullYear();
+      processedOutput = null;
+    }
+  </script>
+
+<script id="zitro-global-menu-script">
+(function(){
+ const t=document.getElementById('zgmTrigger'),d=document.getElementById('zgmDrawer'),o=document.getElementById('zgmOverlay'),c=document.getElementById('zgmClose');
+ if(!t||!d||!o||!c)return;
+ const set=v=>{d.classList.toggle('open',v);o.classList.toggle('open',v);};
+ t.addEventListener('click',()=>set(!d.classList.contains('open')));
+ c.addEventListener('click',()=>set(false));
+ o.addEventListener('click',()=>set(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')set(false);});
+})();
+</script>
+
+</body>
+</html>

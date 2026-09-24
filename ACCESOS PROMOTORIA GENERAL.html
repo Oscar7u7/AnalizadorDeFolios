@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Solicitudes de Acceso - ZITRO</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .zitro-email-preview {
+      font-family: Arial, Helvetica, sans-serif;
+      color: #000000;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .zitro-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 620px;
+      margin: 15px 0;
+      border: 1.5px solid #000000;
+      background-color: #ffffff;
+    }
+    .zitro-table td, .zitro-table th {
+      border: 1px solid #000000;
+      padding: 6px 10px;
+      font-size: 13px;
+      vertical-align: middle;
+      color: #000000;
+    }
+    .zitro-table .label-col {
+      background-color: #d9d9d9 !important;
+      font-weight: 500;
+      width: 145px;
+      color: #000000;
+    }
+    .zitro-logo-header {
+      text-align: center;
+      padding: 16px 10px;
+      border-bottom: 1.5px solid #000000;
+      background-color: #ffffff;
+    }
+  </style>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style id="winpot-unified-theme">
+    :root{--wp-red:#e11d48;--wp-red-dark:#be123c;--wp-bg:#0b0f19;--wp-card:#1e293b;--wp-border:#334155;--wp-cyan:#06b6d4;--wp-green:#10b981;--wp-text:#f8fafc;--wp-muted:#94a3b8}
+    html{background:var(--wp-bg)}
+    body{font-family:'Outfit',sans-serif!important;background-color:var(--wp-bg)!important;background-image:radial-gradient(circle at 15% 15%,rgba(225,29,72,.08) 0%,transparent 40%),radial-gradient(circle at 85% 85%,rgba(6,182,212,.06) 0%,transparent 40%)!important;background-attachment:fixed!important;color:var(--wp-text)!important}
+    textarea,input,select,button{font-family:'Outfit',sans-serif}
+    textarea{font-family:'JetBrains Mono',monospace!important}
+    textarea:focus,input:focus,select:focus{border-color:var(--wp-cyan)!important;box-shadow:0 0 0 3px rgba(6,182,212,.16)!important;outline:none!important}
+    ::selection{background:var(--wp-red);color:white}
+    .wp-shell{max-width:1320px!important;margin-left:auto!important;margin-right:auto!important}
+    .wp-panel{background:rgba(30,41,59,.72)!important;backdrop-filter:blur(10px);border:1px solid var(--wp-border)!important;border-radius:14px!important;box-shadow:0 10px 25px -5px rgba(0,0,0,.30)!important}
+    .wp-header{background:linear-gradient(135deg,rgba(30,41,59,.82),rgba(15,23,42,.96))!important;backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08)!important;border-left:5px solid var(--wp-red)!important;border-radius:14px!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.5)!important}
+    .wp-brand-badge{background:linear-gradient(135deg,var(--wp-red),#9f1239)!important;box-shadow:0 4px 15px rgba(225,29,72,.35)!important;color:#fff!important}
+    .wp-primary{background:linear-gradient(135deg,var(--wp-red),var(--wp-red-dark))!important;color:white!important;box-shadow:0 4px 12px rgba(225,29,72,.30)!important}
+    .wp-primary:hover{background:linear-gradient(135deg,#f43f5e,var(--wp-red))!important;transform:translateY(-1px)}
+    .wp-export{background:linear-gradient(135deg,#059669,#047857)!important;color:white!important;box-shadow:0 4px 12px rgba(16,185,129,.25)!important}
+    .wp-export:hover{background:linear-gradient(135deg,#10b981,#059669)!important;transform:translateY(-1px)}
+    .wp-info{color:#38bdf8!important}
+    .wp-subpanel{background:rgba(15,23,42,.65)!important;border:1px solid var(--wp-border)!important}
+    @media(max-width:640px){.wp-header{border-left-width:4px!important}}
+  </style>
+
+<style id="zitro-global-menu-style">
+:root{--zgm-topbar-h:68px}
+html{scroll-padding-top:var(--zgm-topbar-h)}
+body{padding-top:var(--zgm-topbar-h)!important}
+.zgm-topbar{
+  box-sizing:border-box;position:fixed;top:0;left:0;right:0;height:var(--zgm-topbar-h);
+  z-index:2147483002;background:#101010;border-bottom:1px solid #2d2d2d;
+  display:flex;align-items:center;padding:0 20px;box-shadow:0 5px 18px rgba(0,0,0,.28);
+  font-family:Arial,sans-serif
+}
+.zgm-trigger{
+  position:static!important;top:auto!important;left:auto!important;z-index:auto!important;
+  height:44px;padding:0 14px;border:1px solid #343434;border-radius:10px;background:#171717;
+  color:#fff;display:flex;align-items:center;gap:10px;box-shadow:none;
+  font-family:Arial,sans-serif;font-weight:800;font-size:12px;letter-spacing:.7px;cursor:pointer
+}
+.zgm-trigger:hover{background:#222}.zgm-bars{width:21px;display:flex;flex-direction:column;gap:4px}
+.zgm-bars i{display:block;height:2px;width:21px;background:#fff;border-radius:3px}
+.zgm-topbar-title{margin-left:14px;color:#777;font-size:11px;font-weight:700;letter-spacing:1px}
+.zgm-overlay{position:fixed;inset:var(--zgm-topbar-h) 0 0 0;z-index:2147482998;background:rgba(0,0,0,.62);opacity:0;visibility:hidden;transition:.2s}
+.zgm-overlay.open{opacity:1;visibility:visible}
+.zgm-drawer{
+  box-sizing:border-box;position:fixed;left:0;top:var(--zgm-topbar-h);z-index:2147483001;
+  width:min(345px,88vw);height:calc(100vh - var(--zgm-topbar-h));
+  background:linear-gradient(180deg,#171717,#080808);border-right:1px solid #303030;
+  box-shadow:20px 0 55px rgba(0,0,0,.55);transform:translateX(-105%);
+  transition:transform .24s ease;padding:20px 17px;font-family:Arial,sans-serif;color:#fff;
+  overflow-y:auto
+}
+.zgm-drawer.open{transform:translateX(0)}
+.zgm-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 18px;border-bottom:1px solid #2a2a2a}
+.zgm-brand{display:flex;align-items:center;gap:11px}.zgm-z{width:39px;height:39px;border-radius:50%;background:#e60000;display:grid;place-items:center;font-weight:900}
+.zgm-brand b{display:block;font-size:14px;letter-spacing:1.4px}.zgm-brand small{display:block;color:#888;margin-top:3px;font-size:10px}
+.zgm-close{width:38px;height:38px;padding:0;border:1px solid #333;border-radius:9px;background:transparent;color:#aaa;font-size:25px;line-height:1;cursor:pointer}
+.zgm-close:hover{background:#222;color:#fff}
+.zgm-nav{display:flex;flex-direction:column;gap:8px;padding-top:19px}.zgm-link{box-sizing:border-box;min-height:52px;padding:11px 13px;border:1px solid transparent;border-radius:10px;color:#ccc;text-decoration:none!important;display:flex;align-items:center;gap:11px;font-size:12px;font-weight:800;letter-spacing:.2px;transition:.16s}
+.zgm-link:hover{background:#1e1e1e;border-color:#333;color:#fff;transform:translateX(3px)}
+.zgm-link.active{background:linear-gradient(90deg,rgba(230,0,0,.24),rgba(230,0,0,.05));border-color:rgba(230,0,0,.5);color:#fff}
+.zgm-icon{flex:0 0 31px;width:31px;height:31px;border-radius:8px;background:#050505;border:1px solid #333;display:grid;place-items:center;color:#aaa;font-size:11px}
+.zgm-link.active .zgm-icon{background:#e60000;border-color:#e60000;color:#fff}
+@media(max-width:650px){
+  :root{--zgm-topbar-h:60px}
+  .zgm-topbar{padding:0 12px}.zgm-trigger{height:40px;padding:0 12px}
+  .zgm-topbar-title{display:none}.zgm-drawer{width:90vw}
+}
+</style>
+
+</head>
+<body class="text-slate-100 min-h-screen font-sans antialiased">
+
+<div class="zgm-topbar"><button class="zgm-trigger" id="zgmTrigger" type="button" aria-label="Abrir menú">
+  <span class="zgm-bars"><i></i><i></i><i></i></span><span>MENÚ</span>
+</button><span class="zgm-topbar-title">ZITRO · HERRAMIENTAS</span></div>
+<div class="zgm-overlay" id="zgmOverlay"></div>
+<aside class="zgm-drawer" id="zgmDrawer">
+  <div class="zgm-head">
+    <div class="zgm-brand"><span class="zgm-z">Z</span><span><b>ZITRO</b><small>HERRAMIENTAS</small></span></div>
+    <button class="zgm-close" id="zgmClose" type="button" aria-label="Cerrar menú">×</button>
+  </div>
+  <nav class="zgm-nav"><a class="zgm-link" href="index.html"><span class="zgm-icon">▦</span><span>ANALISIS DE FOLIOS</span></a>
+<a class="zgm-link" href="ACCESOS WINPOT.html"><span class="zgm-icon">W</span><span>ACCESOS WINPOT</span></a>
+<a class="zgm-link" href="ACCESOS BIG BOLA.html"><span class="zgm-icon">B</span><span>ACCESOS BIG BOLA</span></a>
+<a class="zgm-link active" href="ACCESOS PROMOTORIA GENERAL.html"><span class="zgm-icon">P</span><span>ACCESOS PROMOTORIA GENERAL</span></a></nav>
+</aside>
+
+
+  <!-- Header -->
+  <header class="wp-header wp-shell sticky top-3 z-50 mx-4">
+    <div class="px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="wp-brand-badge h-9 w-9 rounded-lg flex items-center justify-center font-black text-white text-lg">
+          Z
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-white leading-tight">ACCESOS ● PROMOTORIA GENERAL </h1>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <span id="badgeCounter" class="hidden px-3 py-1 bg-sky-500/10 text-sky-400 text-xs font-semibold rounded-full border border-sky-500/20">
+          0 formatos generados
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wp-shell px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Input Section -->
+    <section class="wp-panel p-6 space-y-5">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+             ROL SEMANAL (EXCEL)
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Copia las celdas del rol semanal de promotoria y pégalas directamente en el recuadro.</p>
+        </div>
+        
+        <!-- Detección automática del calendario -->
+        <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 min-w-[230px]">
+          <div class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Mes automático detectado</div>
+          <div id="detectedPeriod" class="text-sm font-bold text-sky-300 mt-0.5">EN ESPERA DE DATOS...</div>
+        </div>
+      </div>
+
+      <div class="relative">
+        <textarea id="pasteArea" rows="7" placeholder="Pega aquí la tabla de promotoria desde Excel" class="w-full bg-slate-950 border border-slate-700 rounded-xl p-4 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500"></textarea>
+      </div>
+
+      <div id="validationAlerts" class="hidden rounded-xl border p-4 text-sm"></div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-between gap-4 pt-1">
+        <div class="text-xs text-slate-400">
+          ✓ DETECCIÓN AUTOMATICA.
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="clearAll()" class="px-3.5 py-2 text-xs font-medium text-slate-400 hover:text-red-400 bg-slate-800 hover:bg-slate-700 rounded-xl transition">
+            Limpiar
+          </button>
+          <button type="button" onclick="processData()" class="wp-primary px-5 py-2 text-xs font-semibold text-white rounded-lg transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            Generar Formatos
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="hidden space-y-6">
+      
+      <div class="wp-panel flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4">
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Filtrar por:</span>
+          <select id="filterSala" onchange="applyFilters()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+            <option value="ALL">Todas las Salas</option>
+          </select>
+          <select id="filterRegion" onchange="applyFilters()" class="bg-slate-950 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none">
+            <option value="ALL">Todas las Regiones</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="copyAllVisible()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            Copiar Todos los Correos Visibles
+          </button>
+        </div>
+      </div>
+
+      <!-- Container of Generated Cards -->
+      <div id="cardsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Cards injected dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center gap-3 bg-emerald-500 text-white font-medium text-xs px-4 py-3 rounded-xl shadow-2xl">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toastMsg">¡Copiado con éxito!</span>
+  </div>
+
+  <script>
+    const REGIONAL_CATALOG = [
+      { id: 'MONTERREY', zona: 'Monterrey', nombre: 'Israel Jonathan Torres Osorio', aliases: ['MONTERREY', 'MTY'] },
+      { id: 'CDMX', zona: 'CDMX 1 y 2', nombre: 'Pamela Ortinez Torres', aliases: ['CDMX', 'CDMX1', 'CDMX2', 'CDMX 1', 'CDMX 2', 'CDMX 1 Y 2'] },
+      { id: 'GUADALAJARA', zona: 'Guadalajara', nombre: 'Lucero Alejandra Alvarez Gonzalez', aliases: ['GUADALAJARA', 'GDL'] },
+      { id: 'PACIFICO', zona: 'Pacífico', nombre: 'Patsy Paola Fajardo Perez', aliases: ['PACIFICO', 'PACÍFICO'] },
+      { id: 'PENINSULA', zona: 'Península', nombre: 'David Cardenas Dominguez', aliases: ['PENINSULA', 'PENÍNSULA'] },
+      { id: 'PUEBLA_VERACRUZ', zona: 'Puebla/Veracruz', nombre: 'Daniela Sotomayor Alarcón', aliases: ['PUEBLA/VERACRUZ', 'PUEBLA VERACRUZ', 'PUE.VER', 'PUE/VER', 'PUEBLA', 'VERACRUZ'] },
+      { id: 'TIJUANA', zona: 'Tijuana', nombre: 'Alfredo Roberto Loera Lafont Díaz de León', aliases: ['TIJUANA', 'TIJ'] },
+      { id: 'CENTRO', zona: 'Centro', nombre: 'Lorena Estefanía Alcántara Saldívar', aliases: ['CENTRO'] }
+    ];
+
+    const DAY_ORDER = ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO'];
+
+    const MONTH_NAMES = [
+      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    ];
+
+    let generatedCards = [];
+
+    function clearAll() {
+      document.getElementById('pasteArea').value = '';
+      document.getElementById('resultsSection').classList.add('hidden');
+      document.getElementById('badgeCounter').classList.add('hidden');
+      document.getElementById('detectedPeriod').textContent = 'EN ESPERA DE DATOS...';
+      renderValidationAlerts([], []);
+      generatedCards = [];
+    }
+
+    function parseClipboardTable(text) {
+      // Excel copia columnas separadas por TAB. No usamos la coma como delimitador,
+      // porque una coma legítima dentro de una celda no debe mover columnas.
+      const rows = [];
+      let currentRow = [''];
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const nextChar = text[i + 1];
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            currentRow[currentRow.length - 1] += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === '\t' && !inQuotes) {
+          currentRow.push('');
+        } else if ((char === '\r' || char === '\n') && !inQuotes) {
+          if (char === '\r' && nextChar === '\n') i++;
+          if (currentRow.some(v => String(v || '').trim() !== '')) rows.push(currentRow);
+          currentRow = [''];
+        } else {
+          currentRow[currentRow.length - 1] += char;
+        }
+      }
+      if (currentRow.some(v => String(v || '').trim() !== '')) rows.push(currentRow);
+      return rows;
+    }
+
+    function normalizeStr(str) {
+      return String(str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+    }
+
+    function normalizeCompact(str) {
+      return normalizeStr(str).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    function levenshtein(a, b) {
+      a = a || ''; b = b || '';
+      const dp = Array.from({ length: a.length + 1 }, () => Array(b.length + 1).fill(0));
+      for (let i = 0; i <= a.length; i++) dp[i][0] = i;
+      for (let j = 0; j <= b.length; j++) dp[0][j] = j;
+      for (let i = 1; i <= a.length; i++) {
+        for (let j = 1; j <= b.length; j++) {
+          const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+          dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + cost);
+        }
+      }
+      return dp[a.length][b.length];
+    }
+
+    function resolveRegional(regionRaw) {
+      const raw = String(regionRaw || '').trim();
+      if (!raw) return { ok: false, input: raw };
+      const input = normalizeCompact(raw);
+
+      for (const reg of REGIONAL_CATALOG) {
+        for (const alias of reg.aliases) {
+          if (input === normalizeCompact(alias)) return { ok: true, ...reg, fuzzy: false, alias };
+        }
+      }
+
+      for (const reg of REGIONAL_CATALOG) {
+        for (const alias of reg.aliases) {
+          const a = normalizeCompact(alias);
+          if (a.length >= 4 && (input.includes(a) || a.includes(input))) {
+            return { ok: true, ...reg, fuzzy: input !== a, alias };
+          }
+        }
+      }
+
+      let best = null;
+      for (const reg of REGIONAL_CATALOG) {
+        for (const alias of reg.aliases) {
+          const a = normalizeCompact(alias);
+          const distance = levenshtein(input, a);
+          const maxLen = Math.max(input.length, a.length) || 1;
+          const similarity = 1 - distance / maxLen;
+          if (!best || similarity > best.similarity) best = { reg, alias, distance, similarity };
+        }
+      }
+      if (best) {
+        const maxLen = Math.max(input.length, normalizeCompact(best.alias).length);
+        const allowedDistance = maxLen <= 6 ? 1 : (maxLen <= 12 ? 2 : 3);
+        if (best.distance <= allowedDistance && best.similarity >= 0.72) {
+          return { ok: true, ...best.reg, fuzzy: true, alias: best.alias, distance: best.distance };
+        }
+      }
+      return { ok: false, input: raw };
+    }
+
+    function dayNameFromHeader(header) {
+      const h = normalizeStr(header).toUpperCase();
+      if (h.includes('LUNES')) return 'LUNES';
+      if (h.includes('MARTES')) return 'MARTES';
+      if (h.includes('MIERCOLES')) return 'MIERCOLES';
+      if (h.includes('JUEVES')) return 'JUEVES';
+      if (h.includes('VIERNES')) return 'VIERNES';
+      if (h.includes('SABADO')) return 'SABADO';
+      if (h.includes('DOMINGO')) return 'DOMINGO';
+      return null;
+    }
+
+    function startOfDay(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function addDays(date, days) {
+      const d = startOfDay(date);
+      d.setDate(d.getDate() + days);
+      return d;
+    }
+
+    function resolveRealDates(dayColumns) {
+      if (!dayColumns.length) return null;
+      const first = dayColumns[0];
+      const firstNumber = parseInt(first.dayNumber, 10);
+      const firstWeekIndex = DAY_ORDER.indexOf(first.weekday);
+      if (isNaN(firstNumber) || firstWeekIndex < 0) return null;
+
+      const today = startOfDay(new Date());
+      const candidates = [];
+      const RADIUS = 370;
+      for (let offset = -RADIUS; offset <= RADIUS; offset++) {
+        const anchor = addDays(today, offset);
+        if (anchor.getDate() !== firstNumber) continue;
+        const jsExpected = firstWeekIndex === 6 ? 0 : firstWeekIndex + 1;
+        if (anchor.getDay() !== jsExpected) continue;
+
+        let valid = true;
+        const dates = [];
+        for (const col of dayColumns) {
+          const idx = DAY_ORDER.indexOf(col.weekday);
+          if (idx < firstWeekIndex) { valid = false; break; }
+          const date = addDays(anchor, idx - firstWeekIndex);
+          if (date.getDate() !== parseInt(col.dayNumber, 10)) { valid = false; break; }
+          dates.push(date);
+        }
+        if (valid) candidates.push({ dates, distance: Math.abs(offset), future: offset >= 0 });
+      }
+      if (!candidates.length) return null;
+      candidates.sort((a, b) => a.distance - b.distance || Number(b.future) - Number(a.future));
+      return candidates[0].dates;
+    }
+
+    function formatDetectedPeriod(dayColumns) {
+      const dates = dayColumns.map(d => d.dateInfo?.date).filter(Boolean);
+      if (!dates.length) return 'MES NO DETECTADO';
+      const first = dates[0], last = dates[dates.length - 1];
+      if (first.getMonth() === last.getMonth() && first.getFullYear() === last.getFullYear()) {
+        return `${MONTH_NAMES[first.getMonth()].toUpperCase()} ${first.getFullYear()}`;
+      }
+      if (first.getFullYear() === last.getFullYear()) {
+        return `${MONTH_NAMES[first.getMonth()].toUpperCase()} - ${MONTH_NAMES[last.getMonth()].toUpperCase()} ${last.getFullYear()}`;
+      }
+      return `${MONTH_NAMES[first.getMonth()].toUpperCase()} ${first.getFullYear()} - ${MONTH_NAMES[last.getMonth()].toUpperCase()} ${last.getFullYear()}`;
+    }
+
+    function extractSchedule(text) {
+      const raw = String(text || '').replace(/\r/g, ' ').replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!raw) return null;
+      const m = raw.match(/(\d{1,2}):(\d{2})\s*(?:A\s*LAS|A|AL|-)\s*(\d{1,2}):(\d{2})\s*(?:HRS?\.?|HORAS?)?/i);
+      if (!m) return null;
+      const h1 = Number(m[1]), min1 = Number(m[2]), h2 = Number(m[3]), min2 = Number(m[4]);
+      const valid = (h, min) => h >= 0 && h <= 24 && min >= 0 && min <= 59 && !(h === 24 && min !== 0);
+      if (!valid(h1, min1) || !valid(h2, min2)) return null;
+      const pad = n => String(n).padStart(2, '0');
+      return `De ${pad(h1)}:${pad(min1)} a ${pad(h2)}:${pad(min2)} hrs.`;
+    }
+
+    function isOnlyScheduleOrSpecial(text) {
+      const raw = normalizeStr(text).toUpperCase();
+      if (!raw) return false;
+      if (/^HORARIO\s+ESPECIAL[.:]?$/i.test(raw)) return true;
+      const schedule = extractSchedule(raw);
+      if (!schedule) return false;
+      const stripped = raw.replace(/\d{1,2}:\d{2}\s*(?:A\s*LAS|A|AL|-)\s*\d{1,2}:\d{2}\s*(?:HRS?\.?|HORAS?)?/i, '').trim();
+      return stripped === '';
+    }
+
+    function renderValidationAlerts(errors = [], warnings = []) {
+      const box = document.getElementById('validationAlerts');
+      if (!errors.length && !warnings.length) {
+        box.className = 'hidden rounded-xl border p-4 text-sm';
+        box.innerHTML = '';
+        return;
+      }
+      const hasErrors = errors.length > 0;
+      box.className = `rounded-xl border p-4 text-sm ${hasErrors ? 'bg-rose-950/50 border-rose-700 text-rose-100' : 'bg-amber-950/40 border-amber-700 text-amber-100'}`;
+      let html = `<div class="font-bold mb-2">${hasErrors ? '⚠ Corrige estos datos antes de generar' : 'Avisos de validación'}</div>`;
+      if (errors.length) html += `<ul class="list-disc pl-5 space-y-1">${errors.map(e => `<li>${e}</li>`).join('')}</ul>`;
+      if (warnings.length) html += `<div class="font-semibold mt-3 mb-1">Avisos:</div><ul class="list-disc pl-5 space-y-1">${warnings.map(w => `<li>${w}</li>`).join('')}</ul>`;
+      box.innerHTML = html;
+    }
+
+    function getZitroHeaderSVG() {
+      return `
+        <div style="text-align: center; padding: 10px 0 6px 0;">
+          <table align="center" style="margin: 0 auto; border-collapse: collapse; border: none;">
+            <tr>
+              <td style="border: none; padding: 0 4px; text-align: center;">
+                <div style="display:inline-block; width: 34px; height: 34px; line-height: 32px; border: 2.5px solid #000; border-radius: 50%; font-size: 20px; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; text-align: center; color: #000;">Z</div>
+              </td>
+              <td style="border: none; padding: 0 4px; text-align: center;">
+                <div style="display:inline-block; width: 34px; height: 34px; line-height: 32px; border: 2.5px solid #000; border-radius: 50%; font-size: 20px; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; text-align: center; color: #000;">I</div>
+              </td>
+              <td style="border: none; padding: 0 4px; text-align: center;">
+                <div style="display:inline-block; width: 34px; height: 34px; line-height: 32px; border: 2.5px solid #000; border-radius: 50%; font-size: 20px; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; text-align: center; color: #000;">T</div>
+              </td>
+              <td style="border: none; padding: 0 4px; text-align: center;">
+                <div style="display:inline-block; width: 34px; height: 34px; line-height: 32px; border: 2.5px solid #000; border-radius: 50%; font-size: 20px; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; text-align: center; color: #000;">R</div>
+              </td>
+              <td style="border: none; padding: 0 4px; text-align: center; position: relative;">
+                <div style="display:inline-block; width: 34px; height: 34px; line-height: 32px; border: 2.5px solid #000; border-radius: 50%; font-size: 20px; font-weight: 900; font-family: 'Arial Black', Arial, sans-serif; text-align: center; color: #000;">O</div>
+                <span style="font-size: 11px; font-weight: bold; position: absolute; top: -2px; right: -8px; font-family: Arial, sans-serif; color: #000;">®</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
+
+    function getRegionalFor(regionName) {
+      const resolved = resolveRegional(regionName);
+      return resolved.ok ? resolved : null;
+    }
+
+    function formatDatesList(dateObjs) {
+      if (!dateObjs || dateObjs.length === 0) return "";
+
+      dateObjs.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+      const uniqueDates = [];
+      dateObjs.forEach(d => {
+        if (!uniqueDates.some(u => u.date.getTime() === d.date.getTime())) {
+          uniqueDates.push(d);
+        }
+      });
+
+      if (uniqueDates.length === 1) {
+        const d = uniqueDates[0];
+        return `${d.day} de ${MONTH_NAMES[d.month]} del ${d.year}`;
+      }
+
+      let isContinuous = true;
+      for (let i = 0; i < uniqueDates.length - 1; i++) {
+        const curr = new Date(uniqueDates[i].date.getTime());
+        curr.setDate(curr.getDate() + 1);
+        if (curr.toDateString() !== uniqueDates[i + 1].date.toDateString()) {
+          isContinuous = false;
+          break;
+        }
+      }
+
+      const first = uniqueDates[0];
+      const last = uniqueDates[uniqueDates.length - 1];
+
+      if (isContinuous) {
+        if (first.month === last.month && first.year === last.year) {
+          return `Del ${first.day} al ${last.day} de ${MONTH_NAMES[first.month]} del ${first.year}`;
+        } else if (first.year === last.year) {
+          return `Del ${first.day} de ${MONTH_NAMES[first.month]} al ${String(last.day).padStart(2, '0')} de ${MONTH_NAMES[last.month]} del ${last.year}`;
+        } else {
+          return `Del ${first.day} de ${MONTH_NAMES[first.month]} del ${first.year} al ${String(last.day).padStart(2, '0')} de ${MONTH_NAMES[last.month]} del ${last.year}`;
+        }
+      }
+
+      const allSameMonth = uniqueDates.every(d => d.month === first.month && d.year === first.year);
+      if (allSameMonth) {
+        const days = uniqueDates.map(d => d.day);
+        if (days.length === 2) {
+          return `${days[0]} y ${days[1]} de ${MONTH_NAMES[first.month]} del ${first.year}`;
+        } else {
+          const lastDay = days.pop();
+          return `${days.join(', ')} y ${lastDay} de ${MONTH_NAMES[first.month]} del ${first.year}`;
+        }
+      }
+
+      const formattedArray = uniqueDates.map(d => `${d.day} de ${MONTH_NAMES[d.month]}`);
+      const lastStr = formattedArray.pop();
+      return `${formattedArray.join(', ')} y ${lastStr} del ${last.year}`;
+    }
+
+    function parseCellContent(rawText, rowHorario) {
+      if (!rawText || !String(rawText).trim()) return null;
+      let clean = String(rawText).replace(/\r/g, '').trim();
+      const norm = normalizeStr(clean).toUpperCase();
+
+      // Marcadores sin visita: nunca deben convertirse en nombre de sala.
+      if (!clean || norm === 'DESCANSO' || norm === 'OFF' || /\bFESTIVO\b/.test(norm)) return null;
+
+      const isAbierto = /HORARIO\s*ABIERTO/i.test(clean);
+      const cellSchedule = extractSchedule(clean);
+      const rowSchedule = extractSchedule(rowHorario);
+
+      // La celda del día tiene prioridad sobre la columna HORARIO.
+      let finalHorario = null;
+      if (isAbierto) finalHorario = 'Horario abierto';
+      else if (cellSchedule) finalHorario = cellSchedule;
+      else if (rowSchedule) finalHorario = rowSchedule;
+
+      // Quitamos del texto sólo los metadatos de horario para aislar la sala.
+      clean = clean
+        .replace(/\(?\s*HORARIO\s*ABIERTO\s*\)?/gi, ' ')
+        .replace(/HORARIO\s+ESPECIAL\s*:?/gi, ' ')
+        .replace(/\d{1,2}:\d{2}\s*(?:A\s*LAS|A|AL|-)\s*\d{1,2}:\d{2}\s*(?:HRS?\.?|HORAS?)?/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      // Si la celda sólo era un horario, no hay sala asignada ese día.
+      if (!clean || isOnlyScheduleOrSpecial(clean)) return null;
+      const sala = clean.replace(/^[\-:()]+|[\-:()]+$/g, '').replace(/\s+/g, ' ').trim().toUpperCase();
+      if (sala.length < 2) return null;
+
+      return { sala, horario: finalHorario, isAbierto, cellSchedule, rowSchedule };
+    }
+
+    function processData() {
+      try {
+        const rawText = document.getElementById('pasteArea').value;
+        if (!rawText || !rawText.trim()) {
+          alert('Por favor pega el contenido de la tabla de programación.');
+          return;
+        }
+
+        const rows = parseClipboardTable(rawText);
+        if (rows.length < 2) {
+          alert('Formato no válido. Debe contener encabezados y filas.');
+          return;
+        }
+
+        const errors = [];
+        const warnings = [];
+        const warningKeys = new Set();
+        document.getElementById('detectedPeriod').textContent = 'DETECTANDO...';
+
+        // Localizar la fila real de encabezados, aunque existan títulos arriba.
+        let headerIdx = -1;
+        for (let i = 0; i < Math.min(rows.length, 10); i++) {
+          const joined = normalizeStr(rows[i].join(' ')).toUpperCase();
+          if (joined.includes('PROMOTOR') && DAY_ORDER.some(d => joined.includes(d))) {
+            headerIdx = i;
+            break;
+          }
+        }
+        if (headerIdx === -1) {
+          renderValidationAlerts(['No se pudo detectar la fila de encabezados. Debe incluir NOMBRE DEL PROMOTOR y al menos un día de la semana.'], []);
+          document.getElementById('resultsSection').classList.add('hidden');
+          document.getElementById('detectedPeriod').textContent = 'NO DETECTADO';
+          return;
+        }
+
+        const headers = rows[headerIdx].map(h => String(h || '').trim());
+        const regionCandidates = [];
+        const promoterCandidates = [];
+        const horarioCandidates = [];
+        const dayColumns = [];
+        const unnumberedDayColumns = [];
+        const seenDays = new Set();
+
+        headers.forEach((h, idx) => {
+          const norm = normalizeStr(h).toUpperCase();
+          if (norm.includes('REGION') || norm === 'ZONA') regionCandidates.push(idx);
+          if (norm.includes('PROMOTOR') || norm === 'NOMBRE') promoterCandidates.push(idx);
+          if (norm.includes('HORARIO')) horarioCandidates.push(idx);
+
+          const weekday = dayNameFromHeader(h);
+          if (weekday) {
+            const m = h.match(/\d{1,2}/);
+            if (!m) {
+              unnumberedDayColumns.push({ index: idx, weekday, headerName: h });
+              warnings.push(`La columna "${h}" corresponde a ${weekday}, pero no tiene número de día y no se utilizará.`);
+              return;
+            }
+            if (seenDays.has(weekday)) {
+              errors.push(`Hay más de una columna para ${weekday}. Revisa los encabezados.`);
+              return;
+            }
+            seenDays.add(weekday);
+            dayColumns.push({ index: idx, weekday, dayNumber: parseInt(m[0], 10), headerName: h });
+          }
+        });
+
+        if (regionCandidates.length !== 1) {
+          errors.push(regionCandidates.length === 0 ? 'No se encontró la columna REGIÓN/ZONA.' : 'Se encontró más de una columna REGIÓN/ZONA.');
+        }
+        if (promoterCandidates.length !== 1) {
+          errors.push(promoterCandidates.length === 0 ? 'No se encontró la columna NOMBRE DEL PROMOTOR.' : 'Se encontró más de una columna de PROMOTOR/NOMBRE.');
+        }
+        if (horarioCandidates.length > 1) errors.push('Se encontró más de una columna HORARIO. Corrige el encabezado antes de generar.');
+        if (!dayColumns.length) errors.push('No se detectaron columnas de días con número, por ejemplo MARTES 22.');
+
+        const regionIdx = regionCandidates[0] ?? -1;
+        const promoterIdx = promoterCandidates[0] ?? -1;
+        const horarioIdx = horarioCandidates[0] ?? -1;
+
+        // Si falta HORARIO, detectar el error típico de una columna de día mal nombrada
+        // cuyos valores en realidad son sólo horarios.
+        if (horarioIdx === -1) {
+          const columnsToInspect = [...dayColumns, ...unnumberedDayColumns];
+          for (const dc of columnsToInspect) {
+            let nonEmpty = 0, onlySchedules = 0;
+            for (let r = headerIdx + 1; r < rows.length; r++) {
+              const value = rows[r][dc.index] ? String(rows[r][dc.index]).trim() : '';
+              if (!value) continue;
+              nonEmpty++;
+              if (isOnlyScheduleOrSpecial(value)) onlySchedules++;
+            }
+            if (nonEmpty >= 2 && onlySchedules / nonEmpty >= 0.7) {
+              errors.push(`La columna "${dc.headerName}" contiene principalmente horarios. Probablemente ese encabezado debería ser HORARIO.`);
+            }
+          }
+          if (!errors.some(e => e.includes('debería ser HORARIO'))) {
+            warnings.push('No se encontró columna HORARIO. Se usarán únicamente los horarios escritos dentro de las celdas de cada día.');
+          }
+        }
+
+        dayColumns.sort((a, b) => DAY_ORDER.indexOf(a.weekday) - DAY_ORDER.indexOf(b.weekday));
+        const resolvedDates = dayColumns.length ? resolveRealDates(dayColumns) : null;
+        if (dayColumns.length && !resolvedDates) {
+          errors.push('Los números de los días no corresponden a una semana real cercana a la fecha actual. Revisa los encabezados.');
+          document.getElementById('detectedPeriod').textContent = 'NO DETECTADO';
+        } else if (resolvedDates) {
+          dayColumns.forEach((col, i) => {
+            const date = resolvedDates[i];
+            col.dateInfo = { day: date.getDate(), month: date.getMonth(), year: date.getFullYear(), date };
+          });
+          document.getElementById('detectedPeriod').textContent = formatDetectedPeriod(dayColumns);
+        }
+
+        if (errors.length) {
+          renderValidationAlerts(errors, warnings);
+          document.getElementById('resultsSection').classList.add('hidden');
+          document.getElementById('badgeCounter').classList.add('hidden');
+          return;
+        }
+
+        const salaMap = new Map();
+        const unknownRegions = [];
+        const contradictions = [];
+        const missingScheduleEvents = [];
+
+        for (let i = headerIdx + 1; i < rows.length; i++) {
+          const cols = rows[i];
+          if (!cols || !cols.some(c => String(c || '').trim() !== '')) continue;
+
+          const regionRaw = cols[regionIdx] ? String(cols[regionIdx]).trim() : '';
+          const promoter = cols[promoterIdx] ? String(cols[promoterIdx]).trim() : '';
+          if (!promoter && !regionRaw) continue;
+          if (!promoter) {
+            warnings.push(`Fila ${i + 1}: no tiene nombre de promotor y fue omitida.`);
+            continue;
+          }
+
+          const regional = getRegionalFor(regionRaw);
+          if (!regional) {
+            unknownRegions.push(`Fila ${i + 1}: la región "${regionRaw || '(vacía)'}" de ${promoter} no fue reconocida.`);
+            continue;
+          }
+          if (regional.fuzzy) {
+            const key = `${regionRaw}=>${regional.id}`;
+            if (!warningKeys.has(key)) {
+              warningKeys.add(key);
+              warnings.push(`La región "${regionRaw}" se interpretó como ${regional.zona}.`);
+            }
+          }
+
+          const rawHorario = horarioIdx !== -1 && cols[horarioIdx] ? String(cols[horarioIdx]).trim() : '';
+          const rowSchedule = extractSchedule(rawHorario);
+          if (rawHorario && !rowSchedule && !/HORARIO\s+ESPECIAL/i.test(rawHorario)) {
+            const key = `badSchedule:${rawHorario}`;
+            if (!warningKeys.has(key)) {
+              warningKeys.add(key);
+              warnings.push(`El valor de HORARIO "${rawHorario}" no tiene un formato reconocible. Se usarán los horarios dentro de las celdas cuando existan.`);
+            }
+          }
+          if (/HORARIO\s+ESPECIAL/i.test(rawHorario)) {
+            const key = `special:${promoter}`;
+            if (!warningKeys.has(key)) {
+              warningKeys.add(key);
+              warnings.push(`HORARIO ESPECIAL detectado para ${promoter}; se tomarán los horarios directamente de sus celdas de visita.`);
+            }
+          }
+
+          dayColumns.forEach(dayCol => {
+            const cellRaw = cols[dayCol.index] || '';
+            const parsed = parseCellContent(cellRaw, rawHorario);
+            if (!parsed) return;
+
+            if (!salaMap.has(parsed.sala)) {
+              salaMap.set(parsed.sala, {
+                regionId: regional.id,
+                region: regional.zona,
+                regional,
+                sala: parsed.sala,
+                events: []
+              });
+            } else if (salaMap.get(parsed.sala).regionId !== regional.id) {
+              contradictions.push(`La sala ${parsed.sala} aparece en ${salaMap.get(parsed.sala).region} y también en ${regional.zona} (${promoter}).`);
+            }
+
+            salaMap.get(parsed.sala).events.push({
+              promoter,
+              dateInfo: dayCol.dateInfo,
+              horario: parsed.horario,
+              isAbierto: parsed.isAbierto,
+              scheduleSource: parsed.cellSchedule ? 'CELDA' : (rowSchedule ? 'COLUMNA' : (parsed.isAbierto ? 'ABIERTO' : 'SIN_HORARIO'))
+            });
+
+            if (!parsed.horario) {
+              missingScheduleEvents.push(`${promoter} en ${parsed.sala}, ${formatDatesList([dayCol.dateInfo])}`);
+            }
+          });
+        }
+
+        if (unknownRegions.length) errors.push(...unknownRegions);
+        if (contradictions.length) errors.push(...[...new Set(contradictions)]);
+        if (!salaMap.size && !errors.length) errors.push('No se detectaron asignaciones de salas válidas en la tabla pegada.');
+
+        if (errors.length) {
+          renderValidationAlerts(errors, warnings);
+          document.getElementById('resultsSection').classList.add('hidden');
+          document.getElementById('badgeCounter').classList.add('hidden');
+          return;
+        }
+
+        if (missingScheduleEvents.length) {
+          const unique = [...new Set(missingScheduleEvents)];
+          warnings.push(`Hay ${unique.length} visita(s) sin horario válido. En el correo aparecerán como "SIN HORARIO DETECTADO" para que puedan revisarse.`);
+        }
+
+        generatedCards = [];
+
+        salaMap.forEach((salaData, salaName) => {
+          const regionalName = salaData.regional.nombre;
+          const promoterDateMap = new Map();
+          const allDates = [];
+          const horarioMap = new Map();
+
+          salaData.events.forEach(ev => {
+            allDates.push(ev.dateInfo);
+            if (!promoterDateMap.has(ev.promoter)) promoterDateMap.set(ev.promoter, []);
+            promoterDateMap.get(ev.promoter).push(ev.dateInfo);
+
+            const horarioKey = ev.horario || 'SIN HORARIO DETECTADO';
+            if (!horarioMap.has(horarioKey)) horarioMap.set(horarioKey, []);
+            horarioMap.get(horarioKey).push(ev.dateInfo);
+          });
+
+          const promotersList = Array.from(promoterDateMap.keys());
+          const overallDateStr = formatDatesList(allDates);
+          let promoterDisplayHTML = '';
+          let areAllDatesEqual = true;
+
+          if (promotersList.length > 1) {
+            const firstPromoterDates = formatDatesList(promoterDateMap.get(promotersList[0]));
+            for (let p = 1; p < promotersList.length; p++) {
+              if (formatDatesList(promoterDateMap.get(promotersList[p])) !== firstPromoterDates) {
+                areAllDatesEqual = false;
+                break;
+              }
+            }
+          }
+
+          if (areAllDatesEqual || promotersList.length === 1) {
+            promoterDisplayHTML = [...promotersList, regionalName].join('<br>');
+          } else {
+            const lines = promotersList.map(p => `${p} (${formatDatesList(promoterDateMap.get(p))})`);
+            lines.push(regionalName);
+            promoterDisplayHTML = lines.join('<br>');
+          }
+
+          const distinctHorarios = Array.from(horarioMap.keys());
+          let finalHorarioDisplay = '';
+          if (distinctHorarios.length === 1) {
+            finalHorarioDisplay = distinctHorarios[0];
+          } else {
+            finalHorarioDisplay = distinctHorarios.map(h => {
+              const formattedSubset = formatDatesList(horarioMap.get(h));
+              return `${h} <span style="color:#555; font-weight:normal;">(${formattedSubset})</span>`;
+            }).join('<br>');
+          }
+
+          generatedCards.push({
+            region: salaData.region,
+            sala: salaName,
+            subject: `SOLICITUD DE ACCESO | ${salaName} | PROMOTORÍA`,
+            regional: regionalName,
+            promotersHTML: promoterDisplayHTML,
+            horario: finalHorarioDisplay,
+            fecha: overallDateStr,
+            nota: `Nota: ${regionalName} es Regional y puede acudir en horario abierto`,
+            actividad: '▶ Promoción de la marca',
+            material: 'Equipo celular, libreta, plumas y material de promoción'
+          });
+        });
+
+        populateFilters();
+        renderCards(generatedCards);
+        renderValidationAlerts([], warnings);
+
+        const resultsSec = document.getElementById('resultsSection');
+        resultsSec.classList.remove('hidden');
+        const badge = document.getElementById('badgeCounter');
+        badge.textContent = `${generatedCards.length} formatos generados`;
+        badge.classList.remove('hidden');
+        resultsSec.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        console.error(err);
+        renderValidationAlerts(['Ocurrió un error al procesar la tabla: ' + err.message], []);
+      }
+    }
+
+    function populateFilters() {
+      const salas = [...new Set(generatedCards.map(c => c.sala))];
+      const regions = [...new Set(generatedCards.map(c => c.region).filter(Boolean))];
+
+      const salaSelect = document.getElementById('filterSala');
+      salaSelect.innerHTML = '<option value="ALL">Todas las Salas</option>' + salas.map(s => `<option value="${s}">${s}</option>`).join('');
+
+      const regSelect = document.getElementById('filterRegion');
+      regSelect.innerHTML = '<option value="ALL">Todas las Regiones</option>' + regions.map(r => `<option value="${r}">${r}</option>`).join('');
+    }
+
+    function applyFilters() {
+      const s = document.getElementById('filterSala').value;
+      const r = document.getElementById('filterRegion').value;
+
+      const filtered = generatedCards.filter(c => {
+        const matchS = (s === 'ALL' || c.sala === s);
+        const matchR = (r === 'ALL' || c.region === r);
+        return matchS && matchR;
+      });
+
+      renderCards(filtered);
+    }
+
+    function buildCardHTML(item, index) {
+      return `
+        <div class="zitro-email-preview" id="email-content-${index}">
+          <p style="margin: 0 0 12px 0; font-family: Arial, sans-serif; font-size: 14px; color: #000000;">Buena tarde</p>
+          <p style="margin: 0 0 14px 0; font-family: Arial, sans-serif; font-size: 14px; color: #000000;">Su apoyo con la gestión del siguiente acceso:</p>
+          
+          <table class="zitro-table" style="border-collapse: collapse; width: 100%; max-width: 600px; border: 1.5px solid #000000; background-color: #ffffff; margin: 12px 0;">
+            <tr>
+              <td colspan="2" class="zitro-logo-header" style="border: 1px solid #000000; text-align: center; padding: 14px 10px; background-color: #ffffff;">
+                ${getZitroHeaderSVG()}
+              </td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; width: 140px; color: #000000;">Sala</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000; font-weight: 500;">${item.sala}</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">Marca</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">ZITRO</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000; vertical-align: top;">Promotor</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000; line-height: 1.4;">${item.promotersHTML}</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000; vertical-align: top;">Horario</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000; line-height: 1.4;">${item.horario}</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">Actividad</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000; font-weight: bold;">${item.actividad}</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">Fecha</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000; font-weight: 500;">${item.fecha}</td>
+            </tr>
+            <tr>
+              <td class="label-col" style="border: 1px solid #000000; padding: 6px 10px; background-color: #d9d9d9; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; color: #000000; vertical-align: top;">Material a ingresar</td>
+              <td style="border: 1px solid #000000; padding: 6px 10px; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">${item.material}</td>
+            </tr>
+          </table>
+
+          <p style="margin: 14px 0 0 0; font-weight: bold; font-family: Arial, sans-serif; font-size: 13px; color: #000000;">${item.nota}</p>
+
+          <p style="margin: 16px 0 0 0; font-family: Arial, sans-serif; font-size: 14px; color: #000000;">Saludos</p>
+        </div>
+      `;
+    }
+
+    function renderCards(items) {
+      const container = document.getElementById('cardsGrid');
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-500 text-sm">
+            No hay formatos para los filtros seleccionados.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map((item, idx) => {
+        return `
+          <div class="generated-email-card wp-panel p-5 flex flex-col justify-between transition hover:border-slate-600 space-y-4" data-subject="${item.subject.replace(/&/g, '&amp;').replace(/"/g, '&quot;')}">
+            <div>
+              <!-- Header Bar of Card with Subject -->
+              <div class="space-y-2 pb-3 border-b border-slate-800">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                      ${item.region || 'ZITRO'}
+                    </span>
+                    <span class="text-xs font-semibold text-white truncate max-w-[200px]" title="${item.sala}">
+                      ${item.sala}
+                    </span>
+                  </div>
+                  <span class="text-[11px] text-slate-400 font-mono">
+                    ${item.fecha}
+                  </span>
+                </div>
+
+                <!-- Subject Bar (Copyable) -->
+                <div class="flex items-center justify-between bg-slate-950 px-3 py-2 rounded-xl border border-slate-800">
+                  <div class="flex items-center gap-2 overflow-hidden mr-2">
+                    <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 shrink-0">Asunto:</span>
+                    <span class="text-xs font-mono font-medium text-amber-300 truncate select-all" id="subject-text-${idx}">
+                      ${item.subject}
+                    </span>
+                  </div>
+                  <button onclick="copySubject(${idx})" title="Copiar Asunto" class="px-2.5 py-1 text-[11px] font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition border border-slate-700 shrink-0 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    Copiar Asunto
+                  </button>
+                  <button onclick="copyToClipboard(${idx})" title="Copiar cuerpo para Gmail" class="wp-primary px-3 py-1 text-[11px] font-bold rounded-lg transition shrink-0 flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                    Copiar Gmail
+                  </button>
+                </div>
+              </div>
+
+              <!-- Visual Preview Box -->
+              <div class="bg-white rounded-xl p-5 border border-slate-300 shadow-inner overflow-x-auto text-black mt-3">
+                ${buildCardHTML(item, idx)}
+              </div>
+            </div>
+
+            <!-- Regional -->
+            <div class="pt-2 border-t border-slate-800/60">
+              <span class="text-xs text-slate-400 font-medium">
+                Reg: <span class="text-slate-300">${item.regional}</span>
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function copySubject(index) {
+      const subjectEl = document.getElementById(`subject-text-${index}`);
+      if (!subjectEl) return;
+
+      const text = subjectEl.innerText.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('¡Asunto copiado al portapapeles!');
+      } catch (e) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('¡Asunto copiado al portapapeles!');
+      }
+    }
+
+    async function copyToClipboard(index) {
+      const previewEl = document.getElementById(`email-content-${index}`);
+      if (!previewEl) return;
+
+      const htmlContent = previewEl.innerHTML;
+      const plainText = previewEl.innerText;
+
+      try {
+        if (navigator.clipboard && window.ClipboardItem) {
+          const blobHtml = new Blob([htmlContent], { type: 'text/html' });
+          const blobText = new Blob([plainText], { type: 'text/plain' });
+          const item = new ClipboardItem({
+            'text/html': blobHtml,
+            'text/plain': blobText
+          });
+          await navigator.clipboard.write([item]);
+        } else {
+          const range = document.createRange();
+          range.selectNode(previewEl);
+          window.getSelection().removeAllRanges();
+          window.getSelection().addRange(range);
+          document.execCommand('copy');
+          window.getSelection().removeAllRanges();
+        }
+
+        showToast('¡Cuerpo copiado con formato! Pégalo en Gmail con Ctrl+V.');
+      } catch (err) {
+        console.error('Error al copiar:', err);
+        showToast('Error al copiar automáticamente.');
+      }
+    }
+
+    async function copyAllVisible() {
+      const wrappers = document.querySelectorAll('.generated-email-card');
+      if (wrappers.length === 0) return;
+
+      let combinedHTML = '';
+      let combinedText = '';
+      wrappers.forEach(wrapper => {
+        const card = wrapper.querySelector('.zitro-email-preview');
+        if (!card) return;
+        const subject = wrapper.getAttribute('data-subject') || '';
+        combinedHTML += `<b>Asunto: ${subject}</b><br>` + card.innerHTML + '<br><br><hr style="border: 1px dashed #ccc; margin: 25px 0;"><br><br>';
+        combinedText += `Asunto: ${subject}\n\n` + card.innerText + '\n\n----------------------------------------\n\n';
+      });
+
+      try {
+        const blobHtml = new Blob([combinedHTML], { type: 'text/html' });
+        const blobText = new Blob([combinedText], { type: 'text/plain' });
+        const item = new ClipboardItem({ 'text/html': blobHtml, 'text/plain': blobText });
+        await navigator.clipboard.write([item]);
+        showToast(`¡Se copiaron ${wrappers.length} formatos visibles al portapapeles!`);
+      } catch (e) {
+        showToast('Error al copiar.');
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+
+<script id="zitro-global-menu-script">
+(function(){
+ const t=document.getElementById('zgmTrigger'),d=document.getElementById('zgmDrawer'),o=document.getElementById('zgmOverlay'),c=document.getElementById('zgmClose');
+ if(!t||!d||!o||!c)return;
+ const set=v=>{d.classList.toggle('open',v);o.classList.toggle('open',v);};
+ t.addEventListener('click',()=>set(!d.classList.contains('open')));
+ c.addEventListener('click',()=>set(false));
+ o.addEventListener('click',()=>set(false));
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')set(false);});
+})();
+</script>
+
+</body>
+</html>
